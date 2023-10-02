@@ -37,7 +37,6 @@ void omp_trap_1_mod(int argc, char* argv[]) {
     n = strtol(argv[4], NULL, 10);
     if (n % thread_count != 0) input_invalido(argv[0]);
 
-    /*The following is the modified part*/
     start_time = omp_get_wtime();
 #pragma omp parallel num_threads(thread_count)
     {
