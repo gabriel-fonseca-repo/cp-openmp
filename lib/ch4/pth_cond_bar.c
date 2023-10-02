@@ -1,4 +1,4 @@
-/* File:  
+/* File:
  *    pth_cond_bar.c
  *
  * Purpose:
@@ -16,7 +16,7 @@
  * Output:
  *    Time for BARRIER_COUNT barriers
  *
- * Note:    
+ * Note:
  *    Verbose output can be enabled with the compile flag -DDEBUG
  *
  * IPP:   Section 4.8.3 (pp. 179 and ff.)
@@ -34,17 +34,17 @@ int barrier_thread_count = 0;
 pthread_mutex_t barrier_mutex;
 pthread_cond_t ok_to_proceed;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void *Thread_work(void* rank);
 
 /*--------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
    long       thread;
-   pthread_t* thread_handles; 
+   pthread_t* thread_handles;
    double start, finish;
 
    if (argc != 2)
-      Usage(argv[0]);
+      como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
 
    thread_handles = malloc (thread_count*sizeof(pthread_t));
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
 
    fprintf(stderr, "usage: %s <number of threads>\n", prog_name);
    exit(0);
@@ -91,7 +91,7 @@ void Usage(char* prog_name) {
  */
 void *Thread_work(void* rank) {
 #  ifdef DEBUG
-   long my_rank = (long) rank; 
+   long my_rank = (long) rank;
 #  endif
    int i;
 
@@ -101,7 +101,7 @@ void *Thread_work(void* rank) {
       if (barrier_thread_count == thread_count) {
          barrier_thread_count = 0;
 #        ifdef DEBUG
-         printf("Thread %ld > Signalling other threads in barrier %d\n", 
+         printf("Thread %ld > Signalling other threads in barrier %d\n",
                my_rank, i);
          fflush(stdout);
 #        endif

@@ -1,7 +1,7 @@
 /* File:     omp_nbody_red.c
  *
- * Purpose:  Use OpenMP to parallelize a 2-dimensional n-body solver 
- *           that uses the reduced algorithm.  This version uses one 
+ * Purpose:  Use OpenMP to parallelize a 2-dimensional n-body solver
+ *           that uses the reduced algorithm.  This version uses one
  *           array per thread to store locally computed forces.
  *           These forces are then added into a shared array.  It
  *           uses a block schedule for each of the parallel for
@@ -13,7 +13,7 @@
  *           To get verbose output, define DEBUG
  *
  * Run:      ./omp_nbody_red <number of threads> <number of particles>
- *              <number of timesteps>  <size of timestep> 
+ *              <number of timesteps>  <size of timestep>
  *              <output frequency> <g|i>
  *              'g': generate initial conditions using a random number
  *                   generator
@@ -21,10 +21,10 @@
  *            0.01 seems to work well as a timestep for the automatically
  *            generated data.
  *
- * Input:    If 'g' is specified on the command line, none.  
- *           If 'i', mass, initial position and initial velocity of 
+ * Input:    If 'g' is specified on the command line, none.
+ *           If 'i', mass, initial position and initial velocity of
  *              each particle
- * Output:   If the output frequency is k, then position and velocity of 
+ * Output:   If the output frequency is k, then position and velocity of
  *              each particle at every kth timestep
  *
  * Force:    The force on particle i due to particle k is given by
@@ -32,10 +32,10 @@
  *    -G m_i m_k (s_i - s_k)/|s_i - s_k|^3
  *
  * Here, m_j is the mass of particle j, s_j is its position vector
- * (at time t), and G is the gravitational constant (see below).  
+ * (at time t), and G is the gravitational constant (see below).
  *
- * Note that the force on particle k due to particle i is 
- * -(force on i due to k).  So we can approximately halve the number 
+ * Note that the force on particle k due to particle i is
+ * -(force on i due to k).  So we can approximately halve the number
  * of force computations.
  *
  * Integration:  We use Euler's method:
@@ -69,15 +69,15 @@ struct particle_s {
    vect_t v;  /* Velocity */
 };
 
-void Usage(char* prog_name);
-void Get_args(int argc, char* argv[], int* thread_count_p, int* n_p, 
+void como_usar(char* prog_name);
+void Get_args(int argc, char* argv[], int* thread_count_p, int* n_p,
       int* n_steps_p, double* delta_t_p, int* output_freq_p, char* g_i_p);
 void Get_init_cond(struct particle_s curr[], int n);
 void Gen_init_cond(struct particle_s curr[], int n);
 void Output_state(double time, struct particle_s curr[], int n);
-void Compute_force(int part, vect_t forces[], struct particle_s curr[], 
+void Compute_force(int part, vect_t forces[], struct particle_s curr[],
       int n);
-void Update_part(int part, vect_t forces[], struct particle_s curr[], 
+void Update_part(int part, vect_t forces[], struct particle_s curr[],
       int n, double delta_t);
 
 /*--------------------------------------------------------------------*/
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
    double start, finish;       /* For timing                       */
    vect_t* loc_forces;         /* Forces computed by each thread   */
 
-   Get_args(argc, argv, &thread_count, &n, &n_steps, &delta_t, 
+   Get_args(argc, argv, &thread_count, &n, &n_steps, &delta_t,
          &output_freq, &g_i);
    curr = malloc(n*sizeof(struct particle_s));
    forces = malloc(n*sizeof(vect_t));
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
          {
             printf("Step %d, after memset loc_forces = \n", step);
             for (part = 0; part < thread_count*n; part++)
-               printf("%d %e %e\n", part, loc_forces[part][X], 
+               printf("%d %e %e\n", part, loc_forces[part][X],
                   loc_forces[part][Y]);
             printf("\n");
          }
@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
 #        pragma omp for schedule(static,1)
          for (part = 0; part < n-1; part++)
             Compute_force(part, loc_forces + my_rank*n, curr, n);
-#        pragma omp for 
+#        pragma omp for
          for (part = 0; part < n; part++) {
             forces[part][X] = forces[part][Y] = 0.0;
             for (thread = 0; thread < thread_count; thread++) {
@@ -170,17 +170,17 @@ int main(int argc, char* argv[]) {
 /*---------------------------------------------------------------------
  * Function: Usage
  * Purpose:  Print instructions for command-line and exit
- * In arg:   
+ * In arg:
  *    prog_name:  the name of the program as typed on the command-line
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage: %s <number of threads> <number of particles>\n",
          prog_name);
    fprintf(stderr, "   <number of timesteps>  <size of timestep>\n");
    fprintf(stderr, "   <output frequency> <g|i>\n");
    fprintf(stderr, "   'g': program should generate init conds\n");
    fprintf(stderr, "   'i': program should get init conds from stdin\n");
-    
+
    exit(0);
 }  /* Usage */
 
@@ -202,10 +202,10 @@ void Usage(char* prog_name) {
  *                     should be generated by the program and 'i' if
  *                     they should be read from stdin
  */
-void Get_args(int argc, char* argv[], int* thread_count_p, int* n_p, 
-      int* n_steps_p, double* delta_t_p, int* output_freq_p, 
+void Get_args(int argc, char* argv[], int* thread_count_p, int* n_p,
+      int* n_steps_p, double* delta_t_p, int* output_freq_p,
       char* g_i_p) {
-   if (argc != 7) Usage(argv[0]);
+   if (argc != 7) como_usar(argv[0]);
    *thread_count_p = strtol(argv[1], NULL, 10);
    *n_p = strtol(argv[2], NULL, 10);
    *n_steps_p = strtol(argv[3], NULL, 10);
@@ -214,8 +214,8 @@ void Get_args(int argc, char* argv[], int* thread_count_p, int* n_p,
    *g_i_p = argv[6][0];
 
    if (*thread_count_p <= 0 || *n_p <= 0 || *n_steps_p < 0 ||
-       *delta_t_p <= 0) Usage(argv[0]);
-   if (*g_i_p != 'g' && *g_i_p != 'i') Usage(argv[0]);
+       *delta_t_p <= 0) como_usar(argv[0]);
+   if (*g_i_p != 'g' && *g_i_p != 'i') como_usar(argv[0]);
 
 #  ifdef DEBUG
    printf("thread_count = %d\n", *thread_count_p);
@@ -231,7 +231,7 @@ void Get_args(int argc, char* argv[], int* thread_count_p, int* n_p,
  * Function:  Get_init_cond
  * Purpose:   Read in initial conditions:  mass, position and velocity
  *            for each particle
- * In args:  
+ * In args:
  *    n:      number of particles
  * Out args:
  *    curr:   array of n structs, each struct stores the mass (scalar),
@@ -256,14 +256,14 @@ void Get_init_cond(struct particle_s curr[], int n) {
  * Function:  Gen_init_cond
  * Purpose:   Generate initial conditions:  mass, position and velocity
  *            for each particle
- * In args:  
+ * In args:
  *    n:      number of particles
  * Out args:
  *    curr:   array of n structs, each struct stores the mass (scalar),
  *            position (vector), and velocity (vector) of a particle
  *
  * Note:      The initial conditions place all particles at
- *            equal intervals on the nonnegative x-axis with 
+ *            equal intervals on the nonnegative x-axis with
  *            identical masses, and identical initial speeds
  *            parallel to the y-axis.  However, some of the
  *            velocities are in the positive y-direction and
@@ -314,10 +314,10 @@ void Output_state(double time, struct particle_s curr[], int n) {
 /*---------------------------------------------------------------------
  * Function:  Compute_force
  * Purpose:   Compute the total force on particle part.  Exploit
- *            the symmetry (force on particle i due to particle k) 
+ *            the symmetry (force on particle i due to particle k)
  *            = -(force on particle k due to particle i) to also
  *            calculate partial forces on other particles.
- * In args:   
+ * In args:
  *    part:   the particle on which we're computing the total force
  *    curr:   current state of the system:  curr[i] stores the mass,
  *            position and velocity of the ith particle
@@ -325,18 +325,18 @@ void Output_state(double time, struct particle_s curr[], int n) {
  * Out arg:
  *    forces: force[i] stores the total force on the ith particle
  *
- * Note: This function uses the force due to gravitation.  So 
+ * Note: This function uses the force due to gravitation.  So
  * the force on particle i due to particle k is given by
  *
  *    m_i m_k (s_k - s_i)/|s_k - s_i|^2
  *
  * Here, m_j is the mass of particle j and s_k is its position vector
- * (at time t). 
+ * (at time t).
  */
-void Compute_force(int part, vect_t forces[], struct particle_s curr[], 
+void Compute_force(int part, vect_t forces[], struct particle_s curr[],
       int n) {
    int k;
-   double mg; 
+   double mg;
    vect_t f_part_k;
    double len, len_3, fact;
 
@@ -383,7 +383,7 @@ void Compute_force(int part, vect_t forces[], struct particle_s curr[],
  * Note:  This version uses Euler's method to update both the velocity
  *    and the position.
  */
-void Update_part(int part, vect_t forces[], struct particle_s curr[], 
+void Update_part(int part, vect_t forces[], struct particle_s curr[],
       int n, double delta_t) {
    double fact = delta_t/curr[part].m;
 

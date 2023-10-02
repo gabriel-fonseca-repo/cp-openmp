@@ -1,14 +1,14 @@
 /* File:     mpi_tsp_dyn.c
  *
- * Purpose:  Use iterative depth-first search and MPI to solve an 
- *           instance of the travelling salesman problem.  This version 
+ * Purpose:  Use iterative depth-first search and MPI to solve an
+ *           instance of the travelling salesman problem.  This version
  *           partitions the search tree using breadth-first search.
  *           Then each process searches its assigned subtree.  Processes
  *           that run out of work request work from other processes.
  *           Processes receiving work requests fulfill requests if
  *           they have sufficient work or send reject messages if
- *           they don't.  This version attempts to reuse deallocated 
- *           tours.  The best tour structure is broadcast using a 
+ *           they don't.  This version attempts to reuse deallocated
+ *           tours.  The best tour structure is broadcast using a
  *           custom non-blocking broadcast.  Termination is detected
  *           using the "total energy" scheme.  This version uses the
  *           "new_frac" implementation of fractions.  All energy is
@@ -18,8 +18,8 @@
  *
  * Compile:  mpicc -g -Wall -o mpi_tsp_dyn mpi_tsp_dyn.c frac.c
  *           Needs frac.h
- *        
- * Usage:    mpiexec -n <proc count> mpi_tsp_dyn <matrix_file> 
+ *
+ * Usage:    mpiexec -n <proc count> mpi_tsp_dyn <matrix_file>
  *              <min split size> <split cut off>
  *
  * Input:    From a user-specified file, the number of cities
@@ -148,7 +148,7 @@ int work_reqs_sent = 0;
 int total_reqs_fulfilled = 0;
 #endif
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Read_digraph(FILE* digraph_file);
 void Print_digraph(void);
 void Check_for_error(int local_ok, char message[], MPI_Comm comm);
@@ -163,7 +163,7 @@ void Set_init_tours(int init_tour_count, int counts[], int displacements[],
 void Build_initial_queue(int** queue_list_p, int queue_size,
       int *init_tour_count_p);
 void Print_tour(tour_t tour, char* title);
-int  Best_tour(tour_t tour); 
+int  Best_tour(tour_t tour);
 void Update_best_tour(tour_t tour);
 void Copy_tour(tour_t tour1, tour_t tour2);
 void Add_city(tour_t tour, city_t);
@@ -182,7 +182,7 @@ void Bcast_tour_cost(cost_t tour_cost);
 
 my_stack_t Init_stack(void);
 void Push(my_stack_t stack, tour_t tour);  // Push pointer
-void Push_copy(my_stack_t stack, tour_t tour, my_stack_t avail); 
+void Push_copy(my_stack_t stack, tour_t tour, my_stack_t avail);
 tour_t Pop(my_stack_t stack);
 int  Empty_stack(my_stack_t stack);
 void Free_stack(my_stack_t stack);
@@ -245,12 +245,12 @@ int main(int argc, char* argv[]) {
    Check_for_error(local_ok, "Can't open digraph file", comm);
    Read_digraph(digraph_file);
    if (my_rank == 0) fclose(digraph_file);
-   if (my_rank == 0) 
+   if (my_rank == 0)
       min_split_sz = strtol(argv[2], NULL, 10);
    MPI_Bcast(&min_split_sz, 1, MPI_INT, 0, comm);
    if (min_split_sz <= 0) local_ok = 0;
    Check_for_error(local_ok, "Min split size must be positive", comm);
-   if (my_rank == 0) 
+   if (my_rank == 0)
       split_cutoff = strtol(argv[3], NULL, 10);
    MPI_Bcast(&split_cutoff, 1, MPI_INT, 0, comm);
    if (split_cutoff <= 0) local_ok = 0;
@@ -276,10 +276,10 @@ int main(int argc, char* argv[]) {
    if (my_rank == 0) total_energy_recd = Alloc_frac();
 
 #  ifdef TERM_DEBUG
-   printf("Proc %d > At start my_energy = 1/2^%u\n", 
+   printf("Proc %d > At start my_energy = 1/2^%u\n",
          my_rank, my_energy);
    if (my_rank == 0) {
-      Print_frac(total_energy_recd, my_rank, 
+      Print_frac(total_energy_recd, my_rank,
             "At start total_energy_recd = ");
       printf("Proc %d > At start total energy = %u\n", my_rank, total_energy);
    }
@@ -291,7 +291,7 @@ int main(int argc, char* argv[]) {
    start = MPI_Wtime();
    Par_tree_search();
    finish = MPI_Wtime();
-   
+
    if (my_rank == 0) {
       Print_tour(loc_best_tour, "Best tour");
       printf("Cost = %d\n", loc_best_tour->cost);
@@ -324,7 +324,7 @@ int main(int argc, char* argv[]) {
  * Function: Debug_info
  * Purpose:  Print PID's of running MPI processes so that debuggers can be
  *           attached
- */      
+ */
 void Debug_info(void) {
    int my_rank;
    pid_t pid;
@@ -345,11 +345,11 @@ void Debug_info(void) {
 /*------------------------------------------------------------------
  * Function:  Init_tour
  * Purpose:   Initialize the data members of allocated tour
- * In args:   
+ * In args:
  *    cost:   initial cost of tour
  * Global in:
  *    n:      number of cities in TSP
- * Out arg:   
+ * Out arg:
  *    tour
  * Local function
  */
@@ -427,7 +427,7 @@ void Print_digraph(void) {
 /*------------------------------------------------------------------
  * Function:    Par_tree_search
  * Purpose:     Use multiple threads to search a tree
- * In arg:     
+ * In arg:
  *    rank:     thread rank
  * Globals in:
  *    n:        total number of cities in the problem
@@ -458,7 +458,7 @@ void Par_tree_search(void) {
             Update_best_tour(curr_tour);
          }
       } else {
-         for (nbr = n-1; nbr >= 1; nbr--) 
+         for (nbr = n-1; nbr >= 1; nbr--)
             if (Feasible(curr_tour, nbr)) {
                Add_city(curr_tour, nbr);
                Push_copy(stack, curr_tour, avail);
@@ -511,15 +511,15 @@ void Get_global_best_tour(void) {
       loc_best_tour->count = n+1;
    } else if (my_rank == global_data.rank) {
       MPI_Send(loc_best_tour->cities, n+1, MPI_INT, 0, 0, comm);
-   } 
+   }
 }  /* Get_global_best_tour */
 
 /*------------------------------------------------------------------
  * Function:  Partition_tree
  * Purpose:   Assign each thread its initial collection of subtrees
- * In arg:    
+ * In arg:
  *    my_rank
- * Out args:   
+ * Out args:
  *    stack:  stack will store each thread's initial tours
  *
  */
@@ -540,16 +540,16 @@ void Partition_tree(my_stack_t stack) {
    }
    Check_for_error(local_ok, "Too many processes", comm);
 
-   if (my_rank == 0) 
+   if (my_rank == 0)
       Build_initial_queue(&queue_list, queue_size, &init_tour_count);
    MPI_Bcast(&init_tour_count, 1, MPI_INT, 0, comm);
 
-   Set_init_tours(init_tour_count, counts, displacements, 
+   Set_init_tours(init_tour_count, counts, displacements,
          &my_count, &tour_list);
 
    MPI_Scatterv(queue_list, counts, displacements, tour_arr_mpi_t,
          tour_list, my_count, tour_arr_mpi_t, 0, comm);
-   
+
    Build_init_stack(stack, tour_list, my_count);
 
 #  ifdef DEBUG
@@ -635,7 +635,7 @@ void Set_init_tours(int init_tour_count, int counts[], int displacements[],
 
    quotient = init_tour_count/comm_sz;
    remainder = init_tour_count % comm_sz;
-   for (i = 0; i < remainder; i++) 
+   for (i = 0; i < remainder; i++)
       counts[i] = quotient+1;
    for (i = remainder; i  < comm_sz; i++)
       counts[i] = quotient;
@@ -659,7 +659,7 @@ void Set_init_tours(int init_tour_count, int counts[], int displacements[],
  *
  * Note:  Only called by one process/thread
  */
-void Build_initial_queue(city_t** queue_list_p, int queue_size, 
+void Build_initial_queue(city_t** queue_list_p, int queue_size,
       int* init_tour_count_p) {
    my_queue_t queue;
    int curr_sz = 0, i;
@@ -690,7 +690,7 @@ void Build_initial_queue(city_t** queue_list_p, int queue_size,
       Free_tour(tour, NULL);
    }  /* while */
 
-   *init_tour_count_p = curr_sz; 
+   *init_tour_count_p = curr_sz;
 
 #  ifdef DEBUG
    Print_queue(queue, "Initial queue");
@@ -699,7 +699,7 @@ void Build_initial_queue(city_t** queue_list_p, int queue_size,
    /* Copy the city lists from queue into queue_list */
    queue_list = malloc((*init_tour_count_p)*(n+1)*sizeof(int));
    for (i = 0; i < *init_tour_count_p; i++)
-      memcpy(queue_list + i*(n+1), Queue_elt(queue,i)->cities, 
+      memcpy(queue_list + i*(n+1), Queue_elt(queue,i)->cities,
             (n+1)*sizeof(int));
    *queue_list_p = queue_list;
    Free_queue(queue);
@@ -707,7 +707,7 @@ void Build_initial_queue(city_t** queue_list_p, int queue_size,
 
 /*------------------------------------------------------------------
  * Function:    Best_tour
- * Purpose:     Determine whether addition of the hometown to the 
+ * Purpose:     Determine whether addition of the hometown to the
  *              n-city input tour will lead to a best tour.
  * In arg:
  *    tour:     tour visiting all n cities
@@ -743,7 +743,7 @@ void Look_for_best_tours(void) {
    MPI_Status status;
 
    while(!done) {
-      MPI_Iprobe(MPI_ANY_SOURCE, TOUR_TAG, comm, &msg_avail, 
+      MPI_Iprobe(MPI_ANY_SOURCE, TOUR_TAG, comm, &msg_avail,
             &status);
       if (msg_avail) {
          MPI_Recv(&tour_cost, 1, MPI_INT, status.MPI_SOURCE, TOUR_TAG,
@@ -769,7 +769,7 @@ void Look_for_best_tours(void) {
  * Global out:
  *    loc_best_tour:  the current best tour on this process
  *    best_tour_cost
- * Note: 
+ * Note:
  * 1. The input tour hasn't had the home_town added as the last
  *    city before the call to Update_loc_best_tour.  So we call
  *    Add_city(loc_best_tour, hometown) before returning.
@@ -807,7 +807,7 @@ void Init_cost_msgs(void) {
    cost_msgs->avail = 0;
 
 }  /* Init_cost_msgs */
- 
+
 /*------------------------------------------------------------------
  * Function:  Get_cost_msg
  * Purpose:   Return buffer space and requests for the broadcast of
@@ -829,20 +829,20 @@ int Get_cost_msg(cost_t tour_cost) {
       return offset;
    } else {  // No available buffer:  look for one.
       for (offset = 0; offset < cost_msgs->alloc; offset++) {
-         MPI_Testall(comm_sz, cost_msgs->reqs + offset*comm_sz, 
+         MPI_Testall(comm_sz, cost_msgs->reqs + offset*comm_sz,
                &msgs_completed, MPI_STATUSES_IGNORE);
          if (msgs_completed) {
             Cost_msg(cost_msgs,offset) = tour_cost;
             return offset;
          }
       }
-   } 
-   
+   }
+
    // Can't find any available buffer:  realloc
-   cost_msgs->msgs = 
+   cost_msgs->msgs =
       realloc(cost_msgs->msgs, 2*(cost_msgs->alloc)*sizeof(cost_t));
-   cost_msgs->reqs = 
-      realloc(cost_msgs->reqs, 
+   cost_msgs->reqs =
+      realloc(cost_msgs->reqs,
             2*(cost_msgs->alloc)*comm_sz*sizeof(MPI_Request));
    offset = cost_msgs->alloc;
    cost_msgs->alloc *= 2;
@@ -864,9 +864,9 @@ int Get_cost_msg(cost_t tour_cost) {
 void Free_cost_msgs(void) {
    int msg, dest, msg_completed;
 
-   for (msg = 0; msg < cost_msgs->avail; msg++) 
+   for (msg = 0; msg < cost_msgs->avail; msg++)
       for (dest = 0; dest < comm_sz; dest++)
-         if (dest != my_rank) 
+         if (dest != my_rank)
             if (Cost_req(cost_msgs, msg, dest) != MPI_REQUEST_NULL) {
                MPI_Test(&Cost_req(cost_msgs, msg, dest), &msg_completed,
                      MPI_STATUS_IGNORE);
@@ -952,7 +952,7 @@ void Add_city(tour_t tour, city_t new_city) {
 void Remove_last_city(tour_t tour) {
    city_t old_last_city = Last_city(tour);
    city_t new_last_city;
-   
+
    tour->cities[tour->count-1] = NO_CITY;
    (tour->count)--;
    new_last_city = Last_city(tour);
@@ -976,7 +976,7 @@ void Remove_last_city(tour_t tour) {
 int Feasible(tour_t tour, city_t city) {
    city_t last_city = Last_city(tour);
 
-   if (!Visited(tour, city) && 
+   if (!Visited(tour, city) &&
         Tour_cost(tour) + Cost(last_city,city) < best_tour_cost)
       return TRUE;
    else
@@ -1005,8 +1005,8 @@ int Visited(tour_t tour, city_t city) {
  * Function:  Print_tour
  * Purpose:   Print a tour
  * In args:   All
- * Notes:      
- * 1.  Copying the tour to a string makes it less likely that the 
+ * Notes:
+ * 1.  Copying the tour to a string makes it less likely that the
  *     output will be broken up by another process/thread
  * 2.  Passing a negative value for my_rank will cause the rank
  *     to be omitted from the output
@@ -1050,7 +1050,7 @@ tour_t Alloc_tour(my_stack_t avail) {
  * Purpose:   Free a tour
  * In/out arg:
  *    avail
- * Out arg:   
+ * Out arg:
  *    tour
  */
 void Free_tour(tour_t tour, my_stack_t avail) {
@@ -1108,7 +1108,7 @@ void Push(my_stack_t stack, tour_t tour) {
  * Function:    Push_copy
  * Purpose:     Push a copy of tour onto the top of the stack
  * In arg:      tour
- * In/out arg:  
+ * In/out arg:
  *    stack
  *    avail
  * Error:       If the stack is full, print an error and exit
@@ -1216,7 +1216,7 @@ my_queue_t Init_queue(int size) {
 
 /*------------------------------------------------------------------
  * Function:   Dequeue
- * Purpose:    Remove the tour at the head of the queue and return 
+ * Purpose:    Remove the tour at the head of the queue and return
  *             it
  * In/out arg: queue
  * Ret val:    tour at head of queue
@@ -1252,7 +1252,7 @@ void Enqueue(my_queue_t queue, tour_t tour) {
    Copy_tour(tour, tmp);
 // printf("Enqueuing %p\n", tmp);
    queue->list[queue->tail] = tmp;
-   queue->tail = (queue->tail + 1) % queue->list_alloc; 
+   queue->tail = (queue->tail + 1) % queue->list_alloc;
    if (queue->tail == queue->head)
       queue->full = TRUE;
 
@@ -1279,7 +1279,7 @@ int Empty_queue(my_queue_t queue) {
  */
 void Free_queue(my_queue_t queue) {
 // int i;
-// 
+//
 // for (i = queue->head; i != queue->tail; i = (i+1) % queue->list_alloc) {
 //    free(queue->list[i]->cities);
 //    free(queue->list[i]);
@@ -1309,7 +1309,7 @@ void Print_queue(my_queue_t queue, char title[]) {
 
 /*------------------------------------------------------------------
  * Function:    Get_upper_bd_queue_sz
- * Purpose:     Determine the number of tours needed so that 
+ * Purpose:     Determine the number of tours needed so that
  *              each thread/process gets at least one and a level
  *              of the tree is fully expanded.  Used as upper
  *              bound when building initial queue and used as
@@ -1391,7 +1391,7 @@ int Terminated(my_stack_t stack, my_stack_t avail) {
 #              ifdef TERM_DEBUG
                printf("Proc %d > Terminating\n", my_rank);
                if (my_rank == 0) {
-                  Print_frac(total_energy_recd, my_rank, 
+                  Print_frac(total_energy_recd, my_rank,
                         "Terminating, total_energy_recd = ");
                }
 #              endif
@@ -1445,7 +1445,7 @@ int Short_tour_count(my_stack_t stack) {
  * Purpose:   See if there are requests for work from other processes.
  *            If there are, fulfill one and send rejects to the others.
  *            Otherwise, just return
- * In arg:    tour_count:  the number of tours in stack with < 
+ * In arg:    tour_count:  the number of tours in stack with <
  *            split_cutoff cities
  * In/out arg:  stack, avail
  */
@@ -1472,7 +1472,7 @@ void Fulfill_request(my_stack_t stack, int tour_count,
  *                 than split_cutoff cities
  * In/out arg:  stack
  */
-void Send_work(my_stack_t stack, int dest, int tour_count, 
+void Send_work(my_stack_t stack, int dest, int tour_count,
       my_stack_t avail) {
    int pack_size;
 
@@ -1482,11 +1482,11 @@ void Send_work(my_stack_t stack, int dest, int tour_count,
 #  endif
    Split_stack(stack, tour_count, &pack_size, avail);
 #  ifdef TERM_DEBUG
-   printf("Proc %d > Sending work to %d, pack_size = %d\n", 
+   printf("Proc %d > Sending work to %d, pack_size = %d\n",
          my_rank, dest, pack_size);
 #  endif
 
-   MPI_Send(work_buf, pack_size, MPI_PACKED, dest, FULFILL_REQ_TAG, 
+   MPI_Send(work_buf, pack_size, MPI_PACKED, dest, FULFILL_REQ_TAG,
          comm);
 
 #  ifdef TERM_DEBUG
@@ -1522,7 +1522,7 @@ void Split_stack(my_stack_t stack, int tour_count, int* pack_size_p,
    fflush(stdout);
 #  endif
 
-   MPI_Pack(&tours_to_be_sent, 1, MPI_INT, work_buf, work_buf_alloc, 
+   MPI_Pack(&tours_to_be_sent, 1, MPI_INT, work_buf, work_buf_alloc,
          &pack_size, comm);
 
    old_dest = 1;
@@ -1534,14 +1534,14 @@ void Split_stack(my_stack_t stack, int tour_count, int* pack_size_p,
          my_rank, new_src, stack->list[new_src], pack_size);
       fflush(stdout);
 #     endif
-      MPI_Pack(&stack->list[new_src]->count, 1, MPI_INT, 
+      MPI_Pack(&stack->list[new_src]->count, 1, MPI_INT,
             work_buf, work_buf_alloc, &pack_size, comm);
-      MPI_Pack(&stack->list[new_src]->cost, 1, MPI_INT, 
+      MPI_Pack(&stack->list[new_src]->cost, 1, MPI_INT,
             work_buf, work_buf_alloc, &pack_size, comm);
-      MPI_Pack(stack->list[new_src]->cities, stack->list[new_src]->count, 
+      MPI_Pack(stack->list[new_src]->cities, stack->list[new_src]->count,
             MPI_INT, work_buf, work_buf_alloc, &pack_size, comm);
       Free_tour(stack->list[new_src], avail);
-      if (old_src < stack->list_sz) 
+      if (old_src < stack->list_sz)
          stack->list[old_dest++] = stack->list[old_src];
       new_src += 2;
    }
@@ -1554,7 +1554,7 @@ void Split_stack(my_stack_t stack, int tour_count, int* pack_size_p,
    printf("Proc %d > new stack size = %d\n", my_rank, stack->list_sz);
    fflush(stdout);
 #  endif
-      
+
    my_energy++;
    MPI_Pack(&my_energy, 1, MPI_UNSIGNED,
          work_buf, work_buf_alloc, &pack_size, comm);
@@ -1580,7 +1580,7 @@ void Send_rejects(void) {
    while (req_recd) {
       MPI_Recv(&buf, 0, MPI_INT, status.MPI_SOURCE, WORK_REQ_TAG,
             comm, MPI_STATUS_IGNORE);
-      MPI_Send(&buf, 0, MPI_INT, status.MPI_SOURCE, REJECT_REQ_TAG, 
+      MPI_Send(&buf, 0, MPI_INT, status.MPI_SOURCE, REJECT_REQ_TAG,
             comm);
 #     ifdef TERM_DEBUG
       printf("Proc %d > Sent reject to %d\n", my_rank, status.MPI_SOURCE);
@@ -1593,9 +1593,9 @@ void Send_rejects(void) {
 
 /*---------------------------------------------------------------------
  * Function:  Send_energy
- * Purpose:   Send my_energy to process 0 and set it to 0.  If current 
+ * Purpose:   Send my_energy to process 0 and set it to 0.  If current
  *            process = 0, simply add my_energy into total_energy_recd
- * In/out global: my_energy 
+ * In/out global: my_energy
  */
 void Send_energy(void) {
    if (my_rank == 0)  {
@@ -1603,7 +1603,7 @@ void Send_energy(void) {
 #     ifdef TERM_DEBUG
       printf("Proc %d > added my_energy = 1/2^%u to total_energy_recd\n",
             my_rank, my_energy);
-      Print_frac(total_energy_recd, my_rank, 
+      Print_frac(total_energy_recd, my_rank,
             "In Send_energy, total_energy_recd = ");
 #     endif
    }  else {
@@ -1618,7 +1618,7 @@ void Send_energy(void) {
 
 /*---------------------------------------------------------------------
  * Function:  Send_work_request
- * Purpose:   Increment work_req_dest and send a request for work to 
+ * Purpose:   Increment work_req_dest and send a request for work to
  *            this destination.
  * In/out global:  work_req_dest
  * Note:      This assumes at least two processes
@@ -1626,7 +1626,7 @@ void Send_energy(void) {
 void Send_work_request(void) {
    int buf = 0;
    work_req_dest = (work_req_dest + 1) % comm_sz;
-   if (work_req_dest == my_rank) 
+   if (work_req_dest == my_rank)
       work_req_dest = (work_req_dest + 1) % comm_sz;
    MPI_Send(&buf, 0, MPI_INT, work_req_dest, WORK_REQ_TAG, comm);
 #  ifdef STATS
@@ -1640,18 +1640,18 @@ void Send_work_request(void) {
  *            work from work_req_dest.  If so, return with work_avail
  *            = TRUE (work_request_sent is a "don't care" in this
  *            case).  If not, check for a reject from work_req_dest.
- *            If we there's one in the queue, receive it, and 
- *            return with work_request_sent = TRUE and work_avail 
+ *            If we there's one in the queue, receive it, and
+ *            return with work_request_sent = TRUE and work_avail
  *            = FALSE.  In case of TERM_DEBUG, check to see if there's
  *            some other message from work_request_dest in the queue.
  *            If so, print a message.   Even if TERM_DEBUG is off
- *            return with work_request_sent = TRUE and work_avail 
- *            = FALSE.  
+ *            return with work_request_sent = TRUE and work_avail
+ *            = FALSE.
  * In/out args:  work_request_sent_p (TRUE on entry)
  * Out arg:      work_avail_p
  * Note:
  * 1.  It appears that the sequence of Iprobes is important:  if the current
- *     process probes for a message from work_req_dest, it's possible 
+ *     process probes for a message from work_req_dest, it's possible
  *     work_req_dest may have sent (say) a request for work to curr proc,
  *     which will be placed in the message queue *ahead* of a reject
  *     or a work fulfillment, and the work fulfillment may never be
@@ -1681,7 +1681,7 @@ void Check_for_work(int* work_request_sent_p, int* work_avail_p) {
          *work_avail_p = FALSE;
       } else { /* We didn't get anything from work_req_dest */
 #        ifdef TERM_DEBUG
-         printf("Proc %d > Probed for work from %d, got nothing\n", 
+         printf("Proc %d > Probed for work from %d, got nothing\n",
                my_rank, work_req_dest);
          MPI_Iprobe(work_req_dest, MPI_ANY_TAG, comm, &msg_recd, &status);
          printf("Proc %d > Probed for work from %d, got tag %d\n",
@@ -1689,8 +1689,8 @@ void Check_for_work(int* work_request_sent_p, int* work_avail_p) {
 #        endif
          *work_request_sent_p = TRUE;  // Not necessary
          *work_avail_p = FALSE;
-      }  
-   }  /* Didn't get work */ 
+      }
+   }  /* Didn't get work */
 }  /* Check_for_work */
 
 
@@ -1706,7 +1706,7 @@ void Receive_work(my_stack_t stack, my_stack_t avail) {
 
    MPI_Recv(work_buf, work_buf_alloc, MPI_PACKED, work_req_dest,
          FULFILL_REQ_TAG, comm, MPI_STATUS_IGNORE);
-   
+
    /* Get the number of tours */
    MPI_Unpack(work_buf, work_buf_alloc, &unpack_size,
          &stack_sz, 1, MPI_INT, comm);
@@ -1737,7 +1737,7 @@ void Receive_work(my_stack_t stack, my_stack_t avail) {
  *            ENERGY_TAG and add them into total_energy_recd.  When
  *            done receiving messages if total_energy_recd = comm_sz, send
  *            a termination message to every process and return TRUE.
- *            Otherwise just return FALSE.  
+ *            Otherwise just return FALSE.
  *
  *            If I'm not process 0, check message queue for a TERM_TAG
  *            message.  If one is in the queue, receive it and return
@@ -1757,7 +1757,7 @@ int Term_msg(void) {
                ENERGY_TAG, comm, MPI_STATUS_IGNORE);
          Add(total_energy_recd, recd_frac);
 #        ifdef TERM_DEBUG
-         printf("Proc %d > Received energy = 1/2^%u from %d\n", 
+         printf("Proc %d > Received energy = 1/2^%u from %d\n",
                my_rank, recd_frac, status.MPI_SOURCE);
          Print_frac(total_energy_recd, my_rank, "total_energy_recd");
          Debug_print_frac(total_energy_recd);
@@ -1795,9 +1795,9 @@ int Term_msg(void) {
 void Bcast_term_msg(void) {
    int dest, buf = 0;
 
-   for (dest = 1; dest < comm_sz; dest++) 
+   for (dest = 1; dest < comm_sz; dest++)
       MPI_Send(&buf, 0, MPI_INT, dest, TERM_TAG, comm);
-   
+
 }  /* Bcast_term_msg */
 
 
@@ -1818,7 +1818,7 @@ void Cleanup_msg_queue(void) {
    MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &msg_recd, &status);
    while (msg_recd) {
       /* Just receive the message . . . */
-      MPI_Recv(work_buf, work_buf_alloc, MPI_BYTE, 
+      MPI_Recv(work_buf, work_buf_alloc, MPI_BYTE,
             status.MPI_SOURCE, status.MPI_TAG, comm, MPI_STATUS_IGNORE);
 #     ifdef VERBOSE
       sprintf(string, "Proc %d > Cleanup:  from %d received a ", my_rank,
@@ -1843,7 +1843,7 @@ void Cleanup_msg_queue(void) {
 #           endif
             counts[3]++;
             break;
-         case 4:  //REJECT_REQ_TAG:  
+         case 4:  //REJECT_REQ_TAG:
 #           ifdef VERBOSE
             sprintf(string + strlen(string), "reject");
 #           endif
@@ -1874,7 +1874,7 @@ void Cleanup_msg_queue(void) {
       MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &msg_recd, &status);
    }
    sprintf(string1, "Unknown = %d, Tour = %d, Req = %d,Fulfil = %d, Reject = %d, Term = %d, Energy = %d",
-         counts[0], counts[1], counts[2], 
+         counts[0], counts[1], counts[2],
          counts[3], counts[4], counts[5], counts[6]);
 // printf("Proc %d > %s\n", my_rank, string1);
 }  /* Cleanup_msg_queue */
@@ -1885,8 +1885,8 @@ void Cleanup_msg_queue(void) {
  *            If one has, terminate.
  */
 void Check_for_error(
-      int       local_ok   /* in */, 
-      char      message[]  /* in */, 
+      int       local_ok   /* in */,
+      char      message[]  /* in */,
       MPI_Comm  comm       /* in */) {
    int ok;
 

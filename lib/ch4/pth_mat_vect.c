@@ -1,9 +1,9 @@
-/* File:     
- *     pth_mat_vect.c 
+/* File:
+ *     pth_mat_vect.c
  *
- * Purpose:  
+ * Purpose:
  *     Computes a parallel matrix-vector product.  Matrix
- *     is distributed by block rows.  Vectors are distributed by 
+ *     is distributed by block rows.  Vectors are distributed by
  *     blocks.
  *
  * Input:
@@ -17,16 +17,16 @@
  * Usage:
  *     pth_mat_vect <thread_count>
  *
- * Notes:  
+ * Notes:
  *     1.  Local storage for A, x, y is dynamically allocated.
- *     2.  Number of threads (thread_count) should evenly divide both 
+ *     2.  Number of threads (thread_count) should evenly divide both
  *         m and n.  The program doesn't check for this.
  *     3.  We use a 1-dimensional array for A and compute subscripts
  *         using the formula A[i][j] = A[i*n + j]
- *     4.  Distribution of A, x, and y is logical:  all three are 
+ *     4.  Distribution of A, x, and y is logical:  all three are
  *         globally shared.
  *
- * IPP:    Section 4.3 (pp. 159 and ff.).  Also Section 4.10 (pp. 191 and 
+ * IPP:    Section 4.3 (pp. 159 and ff.).  Also Section 4.10 (pp. 191 and
  *         ff.)
  */
 
@@ -42,7 +42,7 @@ double* x;
 double* y;
 
 /* Serial functions */
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Read_matrix(char* prompt, double A[], int m, int n);
 void Read_vector(char* prompt, double x[], int n);
 void Print_matrix(char* title, double A[], int m, int n);
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
    long       thread;
    pthread_t* thread_handles;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
    thread_count = atoi(argv[1]);
    thread_handles = malloc(thread_count*sizeof(pthread_t));
 
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
    A = malloc(m*n*sizeof(double));
    x = malloc(n*sizeof(double));
    y = malloc(m*sizeof(double));
-   
+
    Read_matrix("Enter the matrix", A, m, n);
    Print_matrix("We read", A, m, n);
 
@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
  *            be, and terminate
  * In arg :   prog_name
  */
-void Usage (char* prog_name) {
+void como_usar (char* prog_name) {
    fprintf(stderr, "usage: %s <thread_count>\n", prog_name);
    exit(0);
 }  /* Usage */
@@ -111,7 +111,7 @@ void Read_matrix(char* prompt, double A[], int m, int n) {
    int             i, j;
 
    printf("%s\n", prompt);
-   for (i = 0; i < m; i++) 
+   for (i = 0; i < m; i++)
       for (j = 0; j < n; j++)
          scanf("%lf", &A[i*n+j]);
 }  /* Read_matrix */
@@ -127,7 +127,7 @@ void Read_vector(char* prompt, double x[], int n) {
    int   i;
 
    printf("%s\n", prompt);
-   for (i = 0; i < n; i++) 
+   for (i = 0; i < n; i++)
       scanf("%lf", &x[i]);
 }  /* Read_vector */
 
@@ -142,7 +142,7 @@ void Read_vector(char* prompt, double x[], int n) {
 void *Pth_mat_vect(void* rank) {
    long my_rank = (long) rank;
    int i, j;
-   int local_m = m/thread_count; 
+   int local_m = m/thread_count;
    int my_first_row = my_rank*local_m;
    int my_last_row = (my_rank+1)*local_m - 1;
 

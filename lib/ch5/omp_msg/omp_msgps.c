@@ -3,7 +3,7 @@
  * Purpose:  Simulate message-passing using OpenMP.  Uses critical and
  *           atomic directives to protect critical sections.
  *
- * Compile:  gcc -g -Wall -fopenmp 
+ * Compile:  gcc -g -Wall -fopenmp
  *                 -o omp_msgps omp_msgps.c queue.c
  *           needs queue.h
  * Usage:    ./omp_msgps <number of threads> <number of messages each
@@ -24,8 +24,8 @@
 
 const int MAX_MSG = 10000;
 
-void Usage(char* prog_name);
-void Send_msg(struct queue_s* msg_queues[], int my_rank, 
+void como_usar(char* prog_name);
+void Send_msg(struct queue_s* msg_queues[], int my_rank,
       int thread_count, int msg_number);
 void Try_receive(struct queue_s* q_p, int my_rank);
 int Done(struct queue_s* q_p, int done_sending, int thread_count);
@@ -37,10 +37,10 @@ int main(int argc, char* argv[]) {
    struct queue_s** msg_queues;
    int done_sending = 0;
 
-   if (argc != 3) Usage(argv[0]);
+   if (argc != 3) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    send_max = strtol(argv[2], NULL, 10);
-   if (thread_count <= 0 || send_max < 0) Usage(argv[0]);
+   if (thread_count <= 0 || send_max < 0) como_usar(argv[0]);
 
    msg_queues = malloc(thread_count*sizeof(struct queue_node_s*));
 
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 }  /* main */
 
 /*-------------------------------------------------------------------*/
-void Usage(char *prog_name) {
+void como_usar(char *prog_name) {
    fprintf(stderr, "usage: %s <number of threads> <number of messages>\n",
          prog_name);
    fprintf(stderr, "   number of messages = number sent by each thread\n");
@@ -87,7 +87,7 @@ void Usage(char *prog_name) {
 }  /* Usage */
 
 /*-------------------------------------------------------------------*/
-void Send_msg(struct queue_s* msg_queues[], int my_rank, 
+void Send_msg(struct queue_s* msg_queues[], int my_rank,
       int thread_count, int msg_number) {
 // int mesg = random() % MAX_MSG;
    int mesg = -msg_number;
@@ -107,7 +107,7 @@ void Try_receive(struct queue_s* q_p, int my_rank) {
    if (queue_size == 0) return;
    else if (queue_size == 1)
 #     pragma omp critical
-      Dequeue(q_p, &src, &mesg);  
+      Dequeue(q_p, &src, &mesg);
    else
       Dequeue(q_p, &src, &mesg);
    printf("Thread %d > received %d from %d\n", my_rank, mesg, src);
@@ -118,6 +118,6 @@ int Done(struct queue_s* q_p, int done_sending, int thread_count) {
    int queue_size = q_p->enqueued - q_p->dequeued;
    if (queue_size == 0 && done_sending == thread_count)
       return 1;
-   else 
+   else
       return 0;
 }   /* Done */

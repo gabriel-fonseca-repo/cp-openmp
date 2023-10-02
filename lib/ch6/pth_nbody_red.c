@@ -1,7 +1,7 @@
 /* File:     pth_nbody_sqr4.c
- * Purpose:  Use Pthreads to parallelize a 2-dimensional n-body solver 
- *           that uses the reduced algorithm.  This version uses local 
- *           storage for the force calculations to avoid the 
+ * Purpose:  Use Pthreads to parallelize a 2-dimensional n-body solver
+ *           that uses the reduced algorithm.  This version uses local
+ *           storage for the force calculations to avoid the
  *           race condition in Compute_force.  Uses a cyclic partition
  *           of the iterations in the Compute_force loop.  The other
  *           loops use a block partition.
@@ -12,7 +12,7 @@
  *           Needs timer.h
  *
  * Run:      ./pth_nbody_sqr4 <number of threads> <number of particles>
- *              <number of timesteps>  <size of timestep> 
+ *              <number of timesteps>  <size of timestep>
  *              <output frequency> <g|i>
  *              'g': generate initial conditions using a random number
  *                   generator
@@ -20,10 +20,10 @@
  *           A stepsize of 0.01 works well with the automatically
  *           generated data.
  *
- * Input:    If 'g' is specified on the command line, none.  
- *           If 'i', mass, initial position and initial velocity of 
+ * Input:    If 'g' is specified on the command line, none.
+ *           If 'i', mass, initial position and initial velocity of
  *              each particle
- * Output:   If the output frequency is k, then position and velocity of 
+ * Output:   If the output frequency is k, then position and velocity of
  *              each particle at every kth timestep
  *
  * Force:    The force on particle i due to particle k is given by
@@ -31,10 +31,10 @@
  *    -G m_i m_k (s_i - s_k)/|s_i - s_k|^3
  *
  * Here, m_j is the mass of particle j, s_j is its position vector
- * (at time t), and G is the gravitational constant (see below).  
+ * (at time t), and G is the gravitational constant (see below).
  *
- * Note that the force on particle k due to particle i is 
- * -(force on i due to k).  So we can approximately halve the number 
+ * Note that the force on particle k due to particle i is
+ * -(force on i due to k).  So we can approximately halve the number
  * of force computations.
  *
  * Integration:  We use Euler's method:
@@ -86,7 +86,7 @@ int b_thread_count = 0;    /* Number of threads that have entered barrier    */
 pthread_mutex_t b_mutex;   /* Mutex used by barrier                          */
 pthread_cond_t b_cond_var; /* Condition variable used by barrier             */
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Get_args(int argc, char* argv[], char* g_i_p);
 void Get_init_cond(void);
 void Gen_init_cond(void);
@@ -104,7 +104,7 @@ void Barrier_destroy(void);
 int main(int argc, char* argv[]) {
    char g_i;                   /* _G_enerate or _i_nput init conds */
    double start, finish;       /* For timing                       */
-   long thread;                
+   long thread;
    pthread_t* thread_handles;
 
    Get_args(argc, argv, &g_i);
@@ -144,17 +144,17 @@ int main(int argc, char* argv[]) {
 /*---------------------------------------------------------------------
  * Function: Usage
  * Purpose:  Print instructions for command-line and exit
- * In arg:   
+ * In arg:
  *    prog_name:  the name of the program as typed on the command-line
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage: %s <number of threads> <number of particles>\n",
          prog_name);
    fprintf(stderr, "   <number of timesteps>  <size of timestep>\n");
    fprintf(stderr, "   <output frequency> <g|i>\n");
    fprintf(stderr, "   'g': program should generate init conds\n");
    fprintf(stderr, "   'i': program should get init conds from stdin\n");
-    
+
    exit(0);
 }  /* Usage */
 
@@ -170,7 +170,7 @@ void Usage(char* prog_name) {
  *    n:               number of particles
  *    n_steps:         number of timesteps
  *    delta_t:         the size of each timestep
- *    output_freq:     the number of timesteps between steps whose 
+ *    output_freq:     the number of timesteps between steps whose
  *                     output is printed
  * Out args:
  *    g_i_p:           pointer to char which is 'g' if the init conds
@@ -178,7 +178,7 @@ void Usage(char* prog_name) {
  *                     they should be read from stdin
  */
 void Get_args(int argc, char* argv[], char* g_i_p) {
-   if (argc != 7) Usage(argv[0]);
+   if (argc != 7) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    n = strtol(argv[2], NULL, 10);
    n_steps = strtol(argv[3], NULL, 10);
@@ -187,8 +187,8 @@ void Get_args(int argc, char* argv[], char* g_i_p) {
    *g_i_p = argv[6][0];
 
    if (thread_count <= 0 || n <= 0 || n_steps < 0 ||
-       delta_t <= 0) Usage(argv[0]);
-   if (*g_i_p != 'g' && *g_i_p != 'i') Usage(argv[0]);
+       delta_t <= 0) como_usar(argv[0]);
+   if (*g_i_p != 'g' && *g_i_p != 'i') como_usar(argv[0]);
 
 #  ifdef DDEBUG
    printf("thread_count = %d\n", thread_count);
@@ -204,10 +204,10 @@ void Get_args(int argc, char* argv[], char* g_i_p) {
  * Function:  Get_init_cond
  * Purpose:   Read in initial conditions:  mass, position and velocity
  *            for each particle
- * Global vars:  
- *    n (in):      number of particles 
+ * Global vars:
+ *    n (in):      number of particles
  *    curr (out):  array of n structs, each struct stores the mass (scalar),
- *      position (vector), and velocity (vector) of a particle 
+ *      position (vector), and velocity (vector) of a particle
  */
 void Get_init_cond(void) {
    int part;
@@ -228,13 +228,13 @@ void Get_init_cond(void) {
  * Function:  Gen_init_cond
  * Purpose:   Generate initial conditions:  mass, position and velocity
  *            for each particle
- * Global vars:  
+ * Global vars:
  *    n (in):      number of particles (in)
  *    curr (out):  array of n structs, each struct stores the mass (scalar),
  *       position (vector), and velocity (vector) of a particle
  *
  * Note:      The initial conditions place all particles at
- *            equal intervals on the nonnegative x-axis with 
+ *            equal intervals on the nonnegative x-axis with
  *            identical masses, and identical initial speeds
  *            parallel to the y-axis.  However, some of the
  *            velocities are in the positive y-direction and
@@ -264,10 +264,10 @@ void Gen_init_cond(void) {
  * Function:  Loop_sched
  * Purpose:   Return the parameters for a block or a cyclic schedule
  *            for a for loop
- * In args:   
+ * In args:
  *    my_rank:       rank of calling thread
  *    thread_count:  number of threads
- *    n:             number of loop iterations 
+ *    n:             number of loop iterations
  *    sched:         schedule:  BLOCK or CYCLIC
  * Out args:
  *    first_p:       pointer to first loop index
@@ -302,11 +302,11 @@ void Loop_schedule(int my_rank, int thread_count, int n, int sched,
  * Function:  Thread_work
  * Purpose:   Execute an individual thread's contribution to finding
  *            the positions and velocities of the particles.
- * In arg:    
+ * In arg:
  *    rank:   thread's rank (0, 1, . . . , thread_count-1)
  * Global vars:
  *    thread_count (in):
- *    
+ *
  */
 void* Thread_work(void* rank) {
    long my_rank = (long) rank;
@@ -382,13 +382,13 @@ void Output_state(double time) {
 /*---------------------------------------------------------------------
  * Function:  Compute_force
  * Purpose:   Compute the total force on particle part.  Exploit
- *            the symmetry (force on particle i due to particle k) 
+ *            the symmetry (force on particle i due to particle k)
  *            = -(force on particle k due to particle i) to also
  *            calculate partial forces on other particles.
- * In arg:   
+ * In arg:
  *    part:   the particle on which we're computing the total force
  * Out arg:
- *    loc_forces: loc_forces[i] stores the force on the ith particle 
+ *    loc_forces: loc_forces[i] stores the force on the ith particle
  *            contributed by particles assigned to this thread.
  *            This is shadowing the global loc_forces
  * Global vars:
@@ -396,17 +396,17 @@ void Output_state(double time) {
  *       position and velocity of the ith particle
  *    n (in):     number of particles
  *
- * Note: This function uses the force due to gravitation.  So 
+ * Note: This function uses the force due to gravitation.  So
  * the force on particle i due to particle k is given by
  *
  *    m_i m_k (s_k - s_i)/|s_k - s_i|^2
  *
  * Here, m_j is the mass of particle j and s_k is its position vector
- * (at time t). 
+ * (at time t).
  */
 void Compute_force(int part, vect_t loc_forces[]) {
    int k;
-   double mg; 
+   double mg;
    vect_t f_part_k;
    double len, len_3, fact;
 
@@ -478,7 +478,7 @@ void Update_part(int part) {
 /*---------------------------------------------------------------------
  * Function:    Barrier_init
  * Purpose:     Initialize data structures needed for Barrier
- * Global vars (all out):  
+ * Global vars (all out):
  *    b_thread_count:  number of threads in the barrier
  *    b_mutex:         mutex used by barrier
  *    b_cond_var:      condition variable used by barrier
@@ -492,7 +492,7 @@ void Barrier_init(void) {
 /*---------------------------------------------------------------------
  * Function:    Barrier
  * Purpose:     Block until all threads have entered the barrier
- * Global vars:  
+ * Global vars:
  *    thread_count (in):       total number of threads
  *    b_thread_count (in/out): number of threads in the barrier
  *    b_mutex (in/out):        mutex used by barrier
@@ -518,7 +518,7 @@ void Barrier(void) {
 /*---------------------------------------------------------------------
  * Function:    Barrier_destroy
  * Purpose:     Destroy data structures needed for Barrier
- * Global vars (all out):  
+ * Global vars (all out):
  *    b_mutex:         mutex used by barrier
  *    b_cond_var:      condition variable used by barrier
  */

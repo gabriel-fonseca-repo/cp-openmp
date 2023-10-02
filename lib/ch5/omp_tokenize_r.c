@@ -1,4 +1,4 @@
-/* File:  
+/* File:
  *    omp_tokenize_r.c
  *
  * Purpose:
@@ -14,7 +14,7 @@
  *    Lines of text
  * Output:
  *    For each line of input:
- *       the line read by the program, and the tokens identified by 
+ *       the line read by the program, and the tokens identified by
  *       strtok
  *
  * Algorithm:
@@ -32,9 +32,9 @@
 const int MAX_LINES = 1000;
 const int MAX_LINE = 80;
 
-void Usage(char* prog_name);
-void Get_text(char* lines[], int* line_count_p);
-void Tokenize(char* lines[], int line_count, int thread_count); 
+void como_usar(char* prog_name);
+void pegar_texto(char* lines[], int* line_count_p);
+void tokens(char* lines[], int line_count, int thread_count);
 
 /*--------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
@@ -42,12 +42,12 @@ int main(int argc, char* argv[]) {
    char* lines[1000];
    int line_count;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
 
    printf("Enter text\n");
-   Get_text(lines, &line_count);
-   Tokenize(lines, line_count, thread_count);
+   pegar_texto(lines, &line_count);
+   tokens(lines, line_count, thread_count);
 
    for (i = 0; i < line_count; i++)
       if (lines[i] != NULL) free(lines[i]);
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
 
    fprintf(stderr, "usage: %s <number of threads>\n", prog_name);
    exit(0);
@@ -73,7 +73,7 @@ void Usage(char* prog_name) {
  *            of input text
  * Out args:  lines, line_count_p
  */
-void Get_text(char* lines[], int* line_count_p) {
+void pegar_texto(char* lines[], int* line_count_p) {
    char* line = malloc(MAX_LINE*sizeof(char));
    int i = 0;
    char* fg_rv;
@@ -93,9 +93,9 @@ void Get_text(char* lines[], int* line_count_p) {
  * In args:     line_count, thread_count
  * In/out arg:  lines
  */
-void Tokenize(
-      char*  lines[]       /* in/out */, 
-      int    line_count    /* in     */, 
+void tokens(
+      char*  lines[]       /* in/out */,
+      int    line_count    /* in     */,
       int    thread_count  /* in     */) {
    int my_rank, i, j;
    char *my_token, *saveptr;
@@ -108,14 +108,14 @@ void Tokenize(
 #     pragma omp for schedule(static, 1)
       for (i = 0; i < line_count; i++) {
          printf("Thread %d > line %d = %s", my_rank, i, lines[i]);
-         j = 0; 
+         j = 0;
          my_token = strtok_r(lines[i], " \t\n", &saveptr);
          while ( my_token != NULL ) {
             printf("Thread %d > token %d = %s\n", my_rank, j, my_token);
             my_token = strtok_r(NULL, " \t\n", &saveptr);
             j++;
-         } 
-      if (lines[i] != NULL) 
+         }
+      if (lines[i] != NULL)
          printf("Thread %d > After tokenizing, my line = %s\n",
             my_rank, lines[i]);
       } /* for i */

@@ -23,7 +23,7 @@
 #include <mpi.h>
 
 /* These aren't modified after initialization. */
-/* So it's probably safe to make them global.  */          
+/* So it's probably safe to make them global.  */
 int my_rank, comm_sz;
 MPI_Comm comm;
 MPI_Datatype cyclic_mpi_t;
@@ -31,7 +31,7 @@ MPI_Datatype cyclic_mpi_t;
 /* Used as temporary storage on process 0 */
 int* scratch = NULL;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Get_args(int argc, char* argv[], int* n_p);
 void Build_cyclic_mpi_type(int loc_n);
 void Get_array(int loc_array[], int n, int loc_n);
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 
    loc_array = malloc(loc_n*sizeof(int));
    if (my_rank == 0) scratch = malloc(n*sizeof(int));
-   
+
    Build_cyclic_mpi_type(loc_n);
 
    Get_array(loc_array, n, loc_n);
@@ -78,16 +78,16 @@ int main(int argc, char* argv[]) {
 /*---------------------------------------------------------------------
  * Function: Usage
  * Purpose:  Print instructions for command-line and exit
- * In arg:   
+ * In arg:
  *    prog_name:  the name of the program as typed on the command-line
  */
-void Usage(char* prog_name) {
-   
-   fprintf(stderr, "usage: mpiexec -n <number of processes> %s <n>\n", 
+void como_usar(char* prog_name) {
+
+   fprintf(stderr, "usage: mpiexec -n <number of processes> %s <n>\n",
          prog_name);
    fprintf(stderr, "   n = number of elements in global array\n");
    fprintf(stderr, "   n should be evenly divisible by comm_sz\n");
-    
+
 }  /* Usage */
 
 
@@ -104,7 +104,7 @@ void Get_args(int argc, char* argv[], int* n_p) {
 
    if (my_rank == 0) {
       if (argc != 2) {
-         Usage(argv[0]);
+         como_usar(argv[0]);
          *n_p = 0;
       } else {
          *n_p = strtol(argv[1], NULL, 10);

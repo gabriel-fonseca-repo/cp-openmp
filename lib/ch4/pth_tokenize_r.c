@@ -1,4 +1,4 @@
-/* File:  
+/* File:
  *    pth_tokenize_r.c
  *
  * Purpose:
@@ -9,7 +9,7 @@
  *    Lines of text
  * Output:
  *    For each line of input:
- *       the line read by the program, and the tokens identified by 
+ *       the line read by the program, and the tokens identified by
  *       strtok_r
  *
  * Compile:
@@ -35,16 +35,16 @@ const int MAX = 1000;
 int thread_count;
 sem_t* sems;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void *Tokenize(void* rank);  /* Thread function */
 
 /*--------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
    long        thread;
-   pthread_t* thread_handles; 
+   pthread_t* thread_handles;
 
    if (argc != 2)
-      Usage(argv[0]);
+      como_usar(argv[0]);
    thread_count = atoi(argv[1]);
 
    thread_handles = (pthread_t*) malloc (thread_count*sizeof(pthread_t));
@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
 
    fprintf(stderr, "usage: %s <number of threads>\n", prog_name);
    exit(0);
@@ -101,23 +101,23 @@ void *Tokenize(void* rank) {
    char *saveptr;
 
    /* Force sequential reading of the input */
-   sem_wait(&sems[my_rank]);  
+   sem_wait(&sems[my_rank]);
    fg_rv = fgets(my_line, MAX, stdin);
-   sem_post(&sems[next]);  
+   sem_post(&sems[next]);
    while (fg_rv != NULL) {
       printf("Thread %ld > my line = %s", my_rank, my_line);
 
-      count = 0; 
+      count = 0;
       my_string = strtok_r(my_line, " \t\n", &saveptr);
       while ( my_string != NULL ) {
          count++;
          printf("Thread %ld > string %d = %s\n", my_rank, count, my_string);
          my_string = strtok_r(NULL, " \t\n", &saveptr);
-      } 
+      }
 
-      sem_wait(&sems[my_rank]); 
+      sem_wait(&sems[my_rank]);
       fg_rv = fgets(my_line, MAX, stdin);
-      sem_post(&sems[next]);  
+      sem_post(&sems[next]);
    }
 
    return NULL;

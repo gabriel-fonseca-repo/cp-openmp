@@ -1,5 +1,5 @@
 /* File:     tsp_rec.c
- * Purpose:  Use recursive depth-first search to solve an instance of the 
+ * Purpose:  Use recursive depth-first search to solve an instance of the
  *           travelling salesman problem.
  *
  * Compile:  gcc -g -Wall -o tsp_rec tsp_rec.c
@@ -62,13 +62,13 @@ long call_count = 0;
 tour_t best_tour;
 #define Cost(city1, city2) (digraph[city1*n + city2])
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Read_digraph(FILE* digraph_file);
 void Print_digraph(void);
 
 void Depth_first_search(tour_t tour);
 void Print_tour(tour_t tour, char* title);
-int  Best_tour(tour_t tour); 
+int  Best_tour(tour_t tour);
 void Update_best_tour(tour_t tour);
 void Copy_tour(tour_t tour1, tour_t tour2);
 void Add_city(tour_t tour, city_t);
@@ -83,17 +83,17 @@ int main(int argc, char* argv[]) {
    tour_t tour;
    double start, finish;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
    digraph_file = fopen(argv[1], "r");
    if (digraph_file == NULL) {
       fprintf(stderr, "Can't open %s\n", argv[1]);
-      Usage(argv[0]);
+      como_usar(argv[0]);
    }
    Read_digraph(digraph_file);
    fclose(digraph_file);
 #  ifdef DEBUG
    Print_digraph();
-#  endif   
+#  endif
 
    best_tour = malloc(sizeof(tour_struct));
    Init_tour(best_tour, INFINITY);
@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
    GET_TIME(start);
    Depth_first_search(tour);
    GET_TIME(finish);
-   
+
    Print_tour(best_tour, "Best tour");
    printf("Cost = %d\n", best_tour->cost);
    printf("Elapsed time = %e seconds\n", finish-start);
@@ -120,11 +120,11 @@ int main(int argc, char* argv[]) {
  * Function:  Init_tour
  * Purpose:   Allocate storage for the cities on the tour, and
  *            initialize the data members
- * In args:   
+ * In args:
  *    cost:   initial cost of tour
  * Global in:
  *    n:      number of cities in TSP
- * Out arg:   
+ * Out arg:
  *    tour
  */
 void Init_tour(tour_t tour, cost_t cost) {
@@ -145,7 +145,7 @@ void Init_tour(tour_t tour, cost_t cost) {
  * Purpose:   Inform user how to start program and exit
  * In arg:    prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage: %s <digraph file>\n", prog_name);
    exit(0);
 }  /* Usage */
@@ -207,7 +207,7 @@ void Print_digraph(void) {
 /*------------------------------------------------------------------
  * Function:    Depth_first_search
  * Purpose:     Recursively search for a least-cost tour
- * In arg:     
+ * In arg:
  *    tour:     partial tour of cities visited so far.
  * Globals in:
  *    n:        total number of cities in the problem
@@ -235,7 +235,7 @@ void Depth_first_search(tour_t tour) {
 #        endif
       }
    } else {
-      for (nbr = 1; nbr < n; nbr++) 
+      for (nbr = 1; nbr < n; nbr++)
          if (Feasible(tour, nbr)) {
             Add_city(tour, nbr);
             Depth_first_search(tour);
@@ -251,7 +251,7 @@ void Depth_first_search(tour_t tour) {
 
 /*------------------------------------------------------------------
  * Function:    Best_tour
- * Purpose:     Determine whether addition of the hometown to the 
+ * Purpose:     Determine whether addition of the hometown to the
  *              n-city input tour will lead to a best tour.
  * In arg:
  *    tour:     tour visiting all n cities
@@ -276,7 +276,7 @@ int Best_tour(tour_t tour) {
  *    tour:     tour that's visited all n-cities
  * Global out:
  *    best_tour:  the current best tour
- * Note: 
+ * Note:
  *    The input tour hasn't had the home_town added as the last
  *    city before the call to Update_best_tour.  So we call
  *    Add_city(best_tour, hometown) before returning.
@@ -331,7 +331,7 @@ void Add_city(tour_t tour, city_t new_city) {
 void Remove_last_city(tour_t tour) {
    city_t old_last_city = Last_city(tour);
    city_t new_last_city;
-   
+
    tour->cities[tour->count-1] = NO_CITY;
    (tour->count)--;
    new_last_city = Last_city(tour);
@@ -355,7 +355,7 @@ void Remove_last_city(tour_t tour) {
 int Feasible(tour_t tour, city_t city) {
    city_t last_city = Last_city(tour);
 
-   if (!Visited(tour, city) && 
+   if (!Visited(tour, city) &&
         Tour_cost(tour) + Cost(last_city,city) < Tour_cost(best_tour))
       return TRUE;
    else

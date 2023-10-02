@@ -1,11 +1,11 @@
-/* File:     
- *     omp_mat_vect.c 
+/* File:
+ *     omp_mat_vect.c
  *
  *
- * Purpose:  
+ * Purpose:
  *     Computes a parallel matrix-vector product.  Matrix
- *     is distributed by block rows.  Vectors are distributed by 
- *     blocks.  Unless the DEBUG flag is turned on this version 
+ *     is distributed by block rows.  Vectors are distributed by
+ *     blocks.  Unless the DEBUG flag is turned on this version
  *     uses a random number generator to generate A and x.
  *
  * Input:
@@ -16,18 +16,18 @@
  *     y: the product vector
  *     Elapsed time for the computation
  *
- * Compile:  
+ * Compile:
  *    gcc -g -Wall -o omp_mat_vect omp_mat_vect.c -lpthread
  * Usage:
  *    omp_mat_vect <thread_count> <m> <n>
  *
- * Notes:  
+ * Notes:
  *     1.  Storage for A, x, y is dynamically allocated.
- *     2.  Number of threads (thread_count) should evenly divide both 
+ *     2.  Number of threads (thread_count) should evenly divide both
  *         m and n.  The program doesn't check for this.
  *     3.  We use a 1-dimensional array for A and compute subscripts
  *         using the formula A[i][j] = A[i*n + j]
- *     4.  Distribution of A, x, and y is logical:  all three are 
+ *     4.  Distribution of A, x, and y is logical:  all three are
  *         globally shared.
  *     5.  DEBUG compile flag will prompt for input of A, x, and
  *         print y
@@ -42,9 +42,9 @@
 #include <omp.h>
 
 /* Serial functions */
-void Get_args(int argc, char* argv[], int* thread_count_p, 
+void Get_args(int argc, char* argv[], int* thread_count_p,
       int* m_p, int* n_p);
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Gen_matrix(double A[], int m, int n);
 void Read_matrix(char* prompt, double A[], int m, int n);
 void Gen_vector(double x[], int n);
@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
    A = malloc(m*n*sizeof(double));
    x = malloc(n*sizeof(double));
    y = malloc(m*sizeof(double));
-   
+
  # ifdef DEBUG
       Read_matrix("Enter the matrix", A, m, n);
       Print_matrix("We read", A, m, n);
@@ -104,14 +104,14 @@ int main(int argc, char* argv[]) {
  * In args:   argc, argv
  * Out args:  thread_count_p, m_p, n_p
  */
-void Get_args(int argc, char* argv[], int* thread_count_p, 
+void Get_args(int argc, char* argv[], int* thread_count_p,
       int* m_p, int* n_p)  {
 
-   if (argc != 4) Usage(argv[0]);
+   if (argc != 4) como_usar(argv[0]);
    *thread_count_p = strtol(argv[1], NULL, 10);
    *m_p = strtol(argv[2], NULL, 10);
    *n_p = strtol(argv[3], NULL, 10);
-   if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0) Usage(argv[0]);
+   if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0) como_usar(argv[0]);
 
 }  /* Get_args */
 
@@ -121,7 +121,7 @@ void Get_args(int argc, char* argv[], int* thread_count_p,
  *            be, and terminate
  * In arg :   prog_name
  */
-void Usage (char* prog_name) {
+void como_usar (char* prog_name) {
    fprintf(stderr, "usage: %s <thread_count> <m> <n>\n", prog_name);
    exit(0);
 }  /* Usage */
@@ -136,7 +136,7 @@ void Read_matrix(char* prompt, double A[], int m, int n) {
    int             i, j;
 
    printf("%s\n", prompt);
-   for (i = 0; i < m; i++) 
+   for (i = 0; i < m; i++)
       for (j = 0; j < n; j++)
          scanf("%lf", &A[i*n+j]);
 }  /* Read_matrix */
@@ -178,7 +178,7 @@ void Read_vector(char* prompt, double x[], int n) {
    int   i;
 
    printf("%s\n", prompt);
-   for (i = 0; i < n; i++) 
+   for (i = 0; i < n; i++)
       scanf("%lf", &x[i]);
 }  /* Read_vector */
 

@@ -43,7 +43,7 @@
 
 /* Serial functions */
 void Get_args(int argc, char* argv[], int* thread_count_p, int* m_p, int* n_p);
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Gen_matrix(double A[], int m, int n);
 void Read_matrix(char* prompt, double A[], int m, int n);
 void Gen_vector(double x[], int n);
@@ -103,11 +103,11 @@ int main(int argc, char* argv[]) {
  * Out args:  thread_count_p, m_p, n_p
  */
 void Get_args(int argc, char* argv[], int* thread_count_p, int* m_p, int* n_p) {
-    if (argc != 4) Usage(argv[0]);
+    if (argc != 4) como_usar(argv[0]);
     *thread_count_p = strtol(argv[1], NULL, 10);
     *m_p = strtol(argv[2], NULL, 10);
     *n_p = strtol(argv[3], NULL, 10);
-    if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0) Usage(argv[0]);
+    if (*thread_count_p <= 0 || *m_p <= 0 || *n_p <= 0) como_usar(argv[0]);
 
 } /* Get_args */
 
@@ -117,7 +117,7 @@ void Get_args(int argc, char* argv[], int* thread_count_p, int* m_p, int* n_p) {
  *            be, and terminate
  * In arg :   prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
     fprintf(stderr, "usage: %s <thread_count> <m> <n>\n", prog_name);
     exit(0);
 } /* Usage */

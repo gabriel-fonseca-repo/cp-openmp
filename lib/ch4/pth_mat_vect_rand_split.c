@@ -1,9 +1,9 @@
-/* File:     
- *     pth_mat_vect_rand_split.c 
+/* File:
+ *     pth_mat_vect_rand_split.c
  *
- * Purpose:  
+ * Purpose:
  *     Computes a parallel matrix-vector product.  Matrix
- *     is distributed by block rows.  Vectors are distributed by 
+ *     is distributed by block rows.  Vectors are distributed by
  *     blocks.  This version uses a random number generator to
  *     generate A and x.  It also makes some small changes to
  *     the multiplication.  These are intended to improve
@@ -16,18 +16,18 @@
  *     y: the product vector
  *     Elapsed time for the computation
  *
- * Compile:  
+ * Compile:
  *    gcc -g -Wall -o pth_mat_vect_rand pth_mat_vect_rand.c -lpthread
  * Usage:
  *     pth_mat_vect <thread_count> <m> <n>
  *
- * Notes:  
+ * Notes:
  *     1.  Local storage for A, x, y is dynamically allocated.
  *     2.  Number of threads (thread_count) should evenly divide
  *         m.  The program doesn't check for this.
  *     3.  We use a 1-dimensional array for A and compute subscripts
  *         using the formula A[i][j] = A[i*n + j]
- *     4.  Distribution of A, x, and y is logical:  all three are 
+ *     4.  Distribution of A, x, and y is logical:  all three are
  *         globally shared.
  *     5.  Compile with -DDEBUG for information on generated data
  *         and product.
@@ -46,7 +46,7 @@ double* x;
 double* y;
 
 /* Serial functions */
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Gen_matrix(double A[], int m, int n);
 void Read_matrix(char* prompt, double A[], int m, int n);
 void Gen_vector(double x[], int n);
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
    long       thread;
    pthread_t* thread_handles;
 
-   if (argc != 4) Usage(argv[0]);
+   if (argc != 4) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    m = strtol(argv[2], NULL, 10);
    n = strtol(argv[3], NULL, 10);
@@ -75,15 +75,15 @@ int main(int argc, char* argv[]) {
    A = malloc(m*n*sizeof(double));
    x = malloc(n*sizeof(double));
    y = malloc(m*sizeof(double));
-   
+
    Gen_matrix(A, m, n);
 #  ifdef DEBUG
-   Print_matrix("We generated", A, m, n); 
+   Print_matrix("We generated", A, m, n);
 #  endif
 
    Gen_vector(x, n);
 #  ifdef DEBUG
-   Print_vector("We generated", x, n); 
+   Print_vector("We generated", x, n);
 #  endif
 
    for (thread = 0; thread < thread_count; thread++)
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
       pthread_join(thread_handles[thread], NULL);
 
 #  ifdef DEBUG
-   Print_vector("The product is", y, m); 
+   Print_vector("The product is", y, m);
 #  endif
 
    free(A);
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
  *            be, and terminate
  * In arg :   prog_name
  */
-void Usage (char* prog_name) {
+void como_usar (char* prog_name) {
    fprintf(stderr, "usage: %s <thread_count> <m> <n>\n", prog_name);
    exit(0);
 }  /* Usage */
@@ -126,7 +126,7 @@ void Read_matrix(char* prompt, double A[], int m, int n) {
    int             i, j;
 
    printf("%s\n", prompt);
-   for (i = 0; i < m; i++) 
+   for (i = 0; i < m; i++)
       for (j = 0; j < n; j++)
          scanf("%lf", &A[i*n+j]);
 }  /* Read_matrix */
@@ -168,7 +168,7 @@ void Read_vector(char* prompt, double x[], int n) {
    int   i;
 
    printf("%s\n", prompt);
-   for (i = 0; i < n; i++) 
+   for (i = 0; i < n; i++)
       scanf("%lf", &x[i]);
 }  /* Read_vector */
 
@@ -183,8 +183,8 @@ void Read_vector(char* prompt, double x[], int n) {
 void *Pth_mat_vect(void* rank) {
    long my_rank = (long) rank;
    int i;
-   int j; 
-   int local_m = m/thread_count; 
+   int j;
+   int local_m = m/thread_count;
    int my_first_row = my_rank*local_m;
    int my_last_row = my_first_row + local_m;
    register int sub = my_first_row*n;
@@ -206,7 +206,7 @@ void *Pth_mat_vect(void* rank) {
       }
    }
    GET_TIME(finish);
-   printf("Thread %ld > Elapsed time = %e seconds\n", 
+   printf("Thread %ld > Elapsed time = %e seconds\n",
       my_rank, finish - start);
 
    return NULL;

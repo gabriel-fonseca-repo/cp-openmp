@@ -1,6 +1,6 @@
 /* File:     tsp_iter2.c
  *
- * Purpose:  Use iterative depth-first search to solve an instance of the 
+ * Purpose:  Use iterative depth-first search to solve an instance of the
  *           travelling salesman problem.  This version pushes an entire
  *           copy of a tour onto the stack and it stores ``freed''
  *           tours in an "avail" stack.
@@ -68,13 +68,13 @@ tour_t best_tour;
 #define Cost(city1, city2) (digraph[city1*n + city2])
 my_stack_t avail;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Read_digraph(FILE* digraph_file);
 void Print_digraph(void);
 
 void Iterative_dfs(tour_t tour);
 void Print_tour(tour_t tour, char* title);
-int  Best_tour(tour_t tour); 
+int  Best_tour(tour_t tour);
 void Update_best_tour(tour_t tour);
 void Copy_tour(tour_t tour1, tour_t tour2);
 void Add_city(tour_t tour, city_t);
@@ -99,17 +99,17 @@ int main(int argc, char* argv[]) {
    tour_t tour;
    double start, finish;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
    digraph_file = fopen(argv[1], "r");
    if (digraph_file == NULL) {
       fprintf(stderr, "Can't open %s\n", argv[1]);
-      Usage(argv[0]);
+      como_usar(argv[0]);
    }
    Read_digraph(digraph_file);
    fclose(digraph_file);
 #  ifdef DEBUG
    Print_digraph();
-#  endif   
+#  endif
    avail = Init_stack();
 
    best_tour = Alloc_tour();
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
    Iterative_dfs(tour);
    GET_TIME(finish);
    Free_tour(tour);
-   
+
    Print_tour(best_tour, "Best tour");
    printf("Cost = %d\n", best_tour->cost);
    printf("Elapsed time = %e seconds\n", finish-start);
@@ -146,11 +146,11 @@ int main(int argc, char* argv[]) {
 /*------------------------------------------------------------------
  * Function:  Init_tour
  * Purpose:   Initialize the data member of allocated tour
- * In args:   
+ * In args:
  *    cost:   initial cost of tour
  * Global in:
  *    n:      number of cities in TSP
- * Out arg:   
+ * Out arg:
  *    tour
  */
 void Init_tour(tour_t tour, cost_t cost) {
@@ -170,7 +170,7 @@ void Init_tour(tour_t tour, cost_t cost) {
  * Purpose:   Inform user how to start program and exit
  * In arg:    prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage: %s <digraph file>\n", prog_name);
    exit(0);
 }  /* Usage */
@@ -233,7 +233,7 @@ void Print_digraph(void) {
  * Function:    Iterative_dfs
  * Purpose:     Use a stack variable to implement an iterative version
  *              of depth-first search
- * In arg:     
+ * In arg:
  *    tour:     partial tour of cities visited so far (just city 0)
  * Globals in:
  *    n:        total number of cities in the problem
@@ -261,7 +261,7 @@ void Iterative_dfs(tour_t tour) {
          if (Best_tour(curr_tour))
             Update_best_tour(curr_tour);
       } else {
-         for (nbr = n-1; nbr >= 1; nbr--) 
+         for (nbr = n-1; nbr >= 1; nbr--)
             if (Feasible(curr_tour, nbr)) {
                Add_city(curr_tour, nbr);
                Push(stack, curr_tour);
@@ -275,7 +275,7 @@ void Iterative_dfs(tour_t tour) {
 
 /*------------------------------------------------------------------
  * Function:    Best_tour
- * Purpose:     Determine whether addition of the hometown to the 
+ * Purpose:     Determine whether addition of the hometown to the
  *              n-city input tour will lead to a best tour.
  * In arg:
  *    tour:     tour visiting all n cities
@@ -300,7 +300,7 @@ int Best_tour(tour_t tour) {
  *    tour:     tour that's visited all n-cities
  * Global out:
  *    best_tour:  the current best tour
- * Note: 
+ * Note:
  *    The input tour hasn't had the home_town added as the last
  *    city before the call to Update_best_tour.  So we call
  *    Add_city(best_tour, hometown) before returning.
@@ -357,7 +357,7 @@ void Add_city(tour_t tour, city_t new_city) {
 void Remove_last_city(tour_t tour) {
    city_t old_last_city = Last_city(tour);
    city_t new_last_city;
-   
+
    tour->cities[tour->count-1] = NO_CITY;
    (tour->count)--;
    new_last_city = Last_city(tour);
@@ -381,7 +381,7 @@ void Remove_last_city(tour_t tour) {
 int Feasible(tour_t tour, city_t city) {
    city_t last_city = Last_city(tour);
 
-   if (!Visited(tour, city) && 
+   if (!Visited(tour, city) &&
         Tour_cost(tour) + Cost(last_city,city) < Tour_cost(best_tour))
       return TRUE;
    else
@@ -470,7 +470,7 @@ my_stack_t Init_stack(void) {
  * Function:    Push_avail
  * Purpose:     Store a tour in the available list
  * In arg:      tour
- * In/out Global:  
+ * In/out Global:
  */
 void Push_avail(tour_t tour) {
    if (avail->list_sz == n*n) {

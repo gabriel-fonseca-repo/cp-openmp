@@ -1,11 +1,11 @@
 /* File:     omp_fibo.c
  *
- * Purpose:  Try to compute n Fibonacci numbers using OpenMP.  Show 
+ * Purpose:  Try to compute n Fibonacci numbers using OpenMP.  Show
  *           what happens if we try to parallelize a loop
  *           with dependences among the iterations.  The program
  *           has a serious bug.
  *
- * Compile:  gcc -g -Wall -fopenmp -o omp_fibo omp_fibo.c 
+ * Compile:  gcc -g -Wall -fopenmp -o omp_fibo omp_fibo.c
  * Run:      ./omp_fibo <number of threads> <number of Fibonacci numbers>
  *
  * Input:    none
@@ -20,13 +20,13 @@
 #include <stdlib.h>
 #include <omp.h>
 
-void Usage(char prog_name[]);
+void como_usar(char prog_name[]);
 
 int main(int argc, char* argv[]) {
    int thread_count, n, i;
    long long* fibo;
 
-   if (argc != 3) Usage(argv[0]);
+   if (argc != 3) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    n = strtol(argv[2], NULL, 10);
 
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
    return 0;
 }  /* main */
 
-void Usage(char prog_name[]) {
+void como_usar(char prog_name[]) {
    fprintf(stderr, "usage:  %s <thread count> <number of Fibonacci numbers>\n",
          prog_name);
    exit(0);

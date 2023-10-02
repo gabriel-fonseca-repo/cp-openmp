@@ -1,6 +1,6 @@
 /* File:    omp_sin_sum.c
  * Purpose: Compute a sum in which each term is the value of a function
- *          applied to a nonnegative integer i and evaluation of the 
+ *          applied to a nonnegative integer i and evaluation of the
  *          function requires work proportional to i.
  *
  * Compile: gcc -g -Wall -fopenmp -I. -o omp_sin_sum omp_sin_sum.c
@@ -19,8 +19,8 @@
  *        sin(i(i+1)/2) + sin(i(i+1)/2 + 1) + . . . + sin(i(i+1)/2 + i)
  *
  * 3.  The parallel for directive uses a runtime schedule clause. So
- *     the environment variable OMP_SCHEDULE should be either 
- *     "static,n/thread_count" for a block schedule or "static,1" 
+ *     the environment variable OMP_SCHEDULE should be either
+ *     "static,n/thread_count" for a block schedule or "static,1"
  *     for a cyclic schedule
  * 4.  Uses the OpenMP library function omp_get_wtime to take timings.
  * 5.  DEBUG flag will print which iterations were assigned to each
@@ -38,7 +38,7 @@
 int*    iterations;
 #endif
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 double Sum(long n, int thread_count);
 double Check_sum(long n, int thread_count);
 double f(long i);
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
    double  start, finish;
    double  error, check;
 
-   if (argc != 3) Usage(argv[0]);
+   if (argc != 3) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    n = strtol(argv[2], NULL, 10);
 #  ifdef DEBUG
@@ -82,9 +82,9 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
 
-   fprintf(stderr, "usage: %s <number of threads> <number of terms>\n", 
+   fprintf(stderr, "usage: %s <number of threads> <number of terms>\n",
          prog_name);
    exit(0);
 }  /* Usage */
@@ -94,7 +94,7 @@ void Usage(char* prog_name) {
  * Purpose:     Compute value of function in which work is
  *              proportional to the size of the first arg.
  * Input arg:   i, n
- * Return val:  
+ * Return val:
  */
 double f(long i) {
    long j;
@@ -113,7 +113,7 @@ double f(long i) {
  * Purpose:     Find the sum of the terms f(0), f(1), . . ., f(n),
  *              where evaluating f requires work proportional to
  *              its argument
- * Input args:  
+ * Input args:
  *    n: number of terms
  *    thread_count:  number of threads
  * Return val:
@@ -154,7 +154,7 @@ double Check_sum(long n, int thread_count) {
 /*------------------------------------------------------------------
  * Function:  Print_iters
  * Purpose:   Print which thread was assigned which iteration.
- * Input args:  
+ * Input args:
  *    iterations:  iterations[i] = thread assigned iteration i
  *    n:           size of iterations array
  */

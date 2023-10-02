@@ -1,6 +1,6 @@
 /*
  * File:     mpi_odd_even.c
- * Purpose:  Implement parallel odd-even sort of an array of 
+ * Purpose:  Implement parallel odd-even sort of an array of
  *           nonegative ints
  * Input:
  *    A:     elements of array (optional)
@@ -9,7 +9,7 @@
  *
  * Compile:  mpicc -g -Wall -o mpi_odd_even mpi_odd_even.c
  * Run:
- *    mpiexec -n <p> mpi_odd_even <g|i> <global_n> 
+ *    mpiexec -n <p> mpi_odd_even <g|i> <global_n>
  *       - p: the number of processes
  *       - g: generate random, distributed list
  *       - i: user will input list on process 0
@@ -28,24 +28,24 @@
 const int RMAX = 100;
 
 /* Local functions */
-void Usage(char* program);
+void como_usar(char* program);
 void Print_list(int local_A[], int local_n, int rank);
-void Merge_low(int local_A[], int temp_B[], int temp_C[], 
+void Merge_low(int local_A[], int temp_B[], int temp_C[],
          int local_n);
-void Merge_high(int local_A[], int temp_B[], int temp_C[], 
+void Merge_high(int local_A[], int temp_B[], int temp_C[],
         int local_n);
 void Generate_list(int local_A[], int local_n, int my_rank);
 int  Compare(const void* a_p, const void* b_p);
 
 /* Functions involving communication */
-void Get_args(int argc, char* argv[], int* global_n_p, int* local_n_p, 
+void Get_args(int argc, char* argv[], int* global_n_p, int* local_n_p,
          char* gi_p, int my_rank, int p, MPI_Comm comm);
-void Sort(int local_A[], int local_n, int my_rank, 
+void Sort(int local_A[], int local_n, int my_rank,
          int p, MPI_Comm comm);
 void Odd_even_iter(int local_A[], int temp_B[], int temp_C[],
          int local_n, int phase, int even_partner, int odd_partner,
          int my_rank, int p, MPI_Comm comm);
-void Print_local_lists(int local_A[], int local_n, 
+void Print_local_lists(int local_A[], int local_n,
          int my_rank, int p, MPI_Comm comm);
 void Print_global_list(int local_A[], int local_n, int my_rank,
          int p, MPI_Comm comm);
@@ -122,7 +122,7 @@ void Generate_list(int local_A[], int local_n, int my_rank) {
  * In arg:    program:  name of executable
  * Note:      Purely local, run only by process 0;
  */
-void Usage(char* program) {
+void como_usar(char* program) {
    fprintf(stderr, "usage:  mpirun -np <p> %s <g|i> <global_n>\n",
        program);
    fprintf(stderr, "   - p: the number of processes \n");
@@ -140,22 +140,22 @@ void Usage(char* program) {
  * Input args:  argc, argv, my_rank, p, comm
  * Output args: global_n_p, local_n_p, gi_p
  */
-void Get_args(int argc, char* argv[], int* global_n_p, int* local_n_p, 
+void Get_args(int argc, char* argv[], int* global_n_p, int* local_n_p,
          char* gi_p, int my_rank, int p, MPI_Comm comm) {
 
    if (my_rank == 0) {
       if (argc != 3) {
-         Usage(argv[0]);
+         como_usar(argv[0]);
          *global_n_p = -1;  /* Bad args, quit */
       } else {
          *gi_p = argv[1][0];
          if (*gi_p != 'g' && *gi_p != 'i') {
-            Usage(argv[0]);
+            como_usar(argv[0]);
             *global_n_p = -1;  /* Bad args, quit */
          } else {
             *global_n_p = atoi(argv[2]);
             if (*global_n_p % p != 0) {
-               Usage(argv[0]);
+               como_usar(argv[0]);
                *global_n_p = -1;
             }
          }
@@ -197,7 +197,7 @@ void Read_list(int local_A[], int local_n, int my_rank, int p,
       printf("Enter the elements of the list\n");
       for (i = 0; i < p*local_n; i++)
          scanf("%d", &temp[i]);
-   } 
+   }
 
    MPI_Scatter(temp, local_n, MPI_INT, local_A, local_n, MPI_INT,
        0, comm);
@@ -210,12 +210,12 @@ void Read_list(int local_A[], int local_n, int my_rank, int p,
 /*-------------------------------------------------------------------
  * Function:   Print_global_list
  * Purpose:    Print the contents of the global list A
- * Input args:  
- *    n, the number of elements 
+ * Input args:
+ *    n, the number of elements
  *    A, the list
  * Note:       Purely local, called only by process 0
  */
-void Print_global_list(int local_A[], int local_n, int my_rank, int p, 
+void Print_global_list(int local_A[], int local_n, int my_rank, int p,
       MPI_Comm comm) {
    int* A;
    int i, n;
@@ -260,9 +260,9 @@ int Compare(const void* a_p, const void* b_p) {
  * Purpose:     Sort local list, use odd-even sort to sort
  *              global list.
  * Input args:  local_n, my_rank, p, comm
- * In/out args: local_A 
+ * In/out args: local_A
  */
-void Sort(int local_A[], int local_n, int my_rank, 
+void Sort(int local_A[], int local_n, int my_rank,
          int p, MPI_Comm comm) {
    int phase;
    int *temp_B, *temp_C;
@@ -281,7 +281,7 @@ void Sort(int local_A[], int local_n, int my_rank,
    } else {
       even_partner = my_rank + 1;
       if (even_partner == p) even_partner = MPI_PROC_NULL;  // Idle during even phase
-      odd_partner = my_rank-1;  
+      odd_partner = my_rank-1;
    }
 
    /* Sort local list using built-in quick sort */
@@ -293,7 +293,7 @@ void Sort(int local_A[], int local_n, int my_rank,
 #  endif
 
    for (phase = 0; phase < p; phase++)
-      Odd_even_iter(local_A, temp_B, temp_C, local_n, phase, 
+      Odd_even_iter(local_A, temp_B, temp_C, local_n, phase,
              even_partner, odd_partner, my_rank, p, comm);
 
    free(temp_B);
@@ -315,7 +315,7 @@ void Odd_even_iter(int local_A[], int temp_B[], int temp_C[],
 
    if (phase % 2 == 0) {
       if (even_partner >= 0) {
-         MPI_Sendrecv(local_A, local_n, MPI_INT, even_partner, 0, 
+         MPI_Sendrecv(local_A, local_n, MPI_INT, even_partner, 0,
             temp_B, local_n, MPI_INT, even_partner, 0, comm,
             &status);
          if (my_rank % 2 != 0)
@@ -325,7 +325,7 @@ void Odd_even_iter(int local_A[], int temp_B[], int temp_C[],
       }
    } else { /* odd phase */
       if (odd_partner >= 0) {
-         MPI_Sendrecv(local_A, local_n, MPI_INT, odd_partner, 0, 
+         MPI_Sendrecv(local_A, local_n, MPI_INT, odd_partner, 0,
             temp_B, local_n, MPI_INT, odd_partner, 0, comm,
             &status);
          if (my_rank % 2 != 0)
@@ -352,7 +352,7 @@ void Merge_low(
       int  temp_keys[],   /* scratch   */
       int  local_n        /* = n/p, in */) {
    int m_i, r_i, t_i;
-   
+
    m_i = r_i = t_i = 0;
    while (t_i < local_n) {
       if (my_keys[m_i] <= recv_keys[r_i]) {
@@ -369,17 +369,17 @@ void Merge_low(
 
 /*-------------------------------------------------------------------
  * Function:    Merge_high
- * Purpose:     Merge the largest local_n elements in local_A 
+ * Purpose:     Merge the largest local_n elements in local_A
  *              and temp_B into temp_C.  Then copy temp_C
  *              back into local_A.
  * In args:     local_n, temp_B
  * In/out args: local_A
  * Scratch:     temp_C
  */
-void Merge_high(int local_A[], int temp_B[], int temp_C[], 
+void Merge_high(int local_A[], int temp_B[], int temp_C[],
         int local_n) {
    int ai, bi, ci;
-   
+
    ai = local_n-1;
    bi = local_n-1;
    ci = local_n-1;
@@ -413,10 +413,10 @@ void Print_list(int local_A[], int local_n, int rank) {
  * Purpose:    Print each process' current list contents
  * Input args: all
  * Notes:
- * 1.  Assumes all participating processes are contributing local_n 
+ * 1.  Assumes all participating processes are contributing local_n
  *     elements
  */
-void Print_local_lists(int local_A[], int local_n, 
+void Print_local_lists(int local_A[], int local_n,
          int my_rank, int p, MPI_Comm comm) {
    int*       A;
    int        q;

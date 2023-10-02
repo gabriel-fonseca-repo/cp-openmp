@@ -4,7 +4,7 @@
  *
  * Compile:  gcc -g -Wall -fopenmp -o omp_hello omp_hello.c
  * Run:      ./omp_hello <number of threads>
- * 
+ *
  * Input:    none
  * Output:   A message from each thread
  *
@@ -19,24 +19,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef _OPENMP
-#  include <omp.h>   
+#  include <omp.h>
 #endif _OPENMP
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Hello(int thread_count);  /* Thread function */
 
 /*--------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
    int thread_count;
 
-   if (argc != 2) Usage(argv[0]);
-   thread_count = strtol(argv[1], NULL, 10); 
-   if (thread_count <= 0) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
+   thread_count = strtol(argv[1], NULL, 10);
+   if (thread_count <= 0) como_usar(argv[0]);
 
-#  pragma omp parallel num_threads(thread_count) 
+#  pragma omp parallel num_threads(thread_count)
    Hello(thread_count);
 
-   return 0; 
+   return 0;
 }  /* main */
 
 /*--------------------------------------------------------------------
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
  * Purpose:   Print a message indicating how program should be started
  *            and terminate.
  */
-void Usage(char *prog_name) {
+void como_usar(char *prog_name) {
    fprintf(stderr, "usage: %s <thread_count>\n", prog_name);
    fprintf(stderr, "   thread_count should be positive\n");
    exit(0);

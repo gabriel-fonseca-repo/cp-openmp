@@ -1,10 +1,10 @@
 /* File:     pth_ll_rwl.c
  *
- * Purpose:  Implement a multi-threaded sorted linked list of 
- *           ints with ops insert, print, member, delete, free list.  
+ * Purpose:  Implement a multi-threaded sorted linked list of
+ *           ints with ops insert, print, member, delete, free list.
  *           This version uses read-write locks
- * 
- * Compile:  gcc -g -Wall -o pth_ll_rwl pth_ll_rwl.c 
+ *
+ * Compile:  gcc -g -Wall -o pth_ll_rwl pth_ll_rwl.c
  *              my_rand.c -lpthread
  *           needs timer.h and my_rand.h
  * Usage:    ./pth_ll_rwl <thread_count>
@@ -42,7 +42,7 @@ struct list_node_s {
 };
 
 /* Shared variables */
-struct      list_node_s* head = NULL;  
+struct      list_node_s* head = NULL;
 int         thread_count;
 int         total_ops;
 double      insert_percent;
@@ -53,7 +53,7 @@ pthread_mutex_t     count_mutex;
 int         member_count = 0, insert_count = 0, delete_count = 0;
 
 /* Setup and cleanup */
-void        Usage(char* prog_name);
+void        como_usar(char* prog_name);
 void        Get_input(int* inserts_in_main_p);
 
 /* Thread function */
@@ -69,14 +69,14 @@ int         Is_empty(void);
 
 /*-----------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
-   long i; 
+   long i;
    int key, success, attempts;
    pthread_t* thread_handles;
    int inserts_in_main;
    unsigned seed = 1;
    double start, finish;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
    thread_count = strtol(argv[1],NULL,10);
 
    Get_input(&inserts_in_main);
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
 
 
 /*-----------------------------------------------------------------*/
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage: %s <thread_count>\n", prog_name);
    exit(0);
 }  /* Usage */
@@ -158,7 +158,7 @@ int Insert(int value) {
    struct list_node_s* pred = NULL;
    struct list_node_s* temp;
    int rv = 1;
-   
+
    while (curr != NULL && curr->data < value) {
       pred = curr;
       curr = curr->next;
@@ -228,7 +228,7 @@ int Delete(int value) {
       pred = curr;
       curr = curr->next;
    }
-   
+
    if (curr != NULL && curr->data == value) {
       if (pred == NULL) { /* first element in list */
          head = curr->next;
@@ -236,7 +236,7 @@ int Delete(int value) {
          printf("Freeing %d\n", value);
 #        endif
          free(curr);
-      } else { 
+      } else {
          pred->next = curr->next;
 #        ifdef DEBUG
          printf("Freeing %d\n", value);
@@ -256,7 +256,7 @@ void Free_list(void) {
    struct list_node_s* following;
 
    if (Is_empty()) return;
-   current = head; 
+   current = head;
    following = current->next;
    while (following != NULL) {
 #     ifdef DEBUG

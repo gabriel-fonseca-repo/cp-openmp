@@ -1,6 +1,6 @@
 /* File:     pth_msg.c
  *
- * Purpose:  Illustrate a synchronization problem with pthreads:  create 
+ * Purpose:  Illustrate a synchronization problem with pthreads:  create
  *           some threads, each of which creates and prints a message.
  *
  * Input:    none
@@ -23,17 +23,17 @@ const int MSG_MAX = 100;
 int thread_count;
 char** messages;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void *Send_msg(void* rank);  /* Thread function */
 
 /*--------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
    long       thread;
-   pthread_t* thread_handles; 
+   pthread_t* thread_handles;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
-   if (thread_count <= 0 || thread_count > MAX_THREADS) Usage(argv[0]);
+   if (thread_count <= 0 || thread_count > MAX_THREADS) como_usar(argv[0]);
 
    thread_handles = (pthread_t*) malloc (thread_count*sizeof(pthread_t));
    messages = (char**) malloc(thread_count*sizeof(char*));
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
 
    fprintf(stderr, "usage: %s <number of threads>\n", prog_name);
    exit(0);
@@ -89,7 +89,7 @@ void *Send_msg(void* rank) {
    sprintf(my_msg, "Hello to %ld from %ld", dest, my_rank);
    messages[dest] = my_msg;
 
-   if (messages[my_rank] != NULL) 
+   if (messages[my_rank] != NULL)
       printf("Thread %ld > %s\n", my_rank, messages[my_rank]);
    else
       printf("Thread %ld > No message from %ld\n", my_rank, source);

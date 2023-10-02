@@ -1,5 +1,5 @@
 /* File:     pth_pi_busy1.c
- * Purpose:  Estimate pi using the series 
+ * Purpose:  Estimate pi using the series
  *
  *              pi = 4*[1 - 1/3 + 1/5 - 1/7 + 1/9 - . . . ]
  *
@@ -19,13 +19,13 @@
  *           the multi-threaded and single-threaded calculations.
  *
  * Notes:
- *    1.  The radius of convergence for the series is only 1.  So the 
+ *    1.  The radius of convergence for the series is only 1.  So the
  *        series converges quite slowly.
  *    2.  This version is likely to become buggy with compiler optimization
  *        turned on.
  *
  * IPP:   Section 4.5 (pp. 165 and ff.)
- */        
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +44,7 @@ void* Thread_sum(void* rank);
 
 /* Only executed by main thread */
 void Get_args(int argc, char* argv[]);
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 double Serial_pi(long long n);
 
 int main(int argc, char* argv[]) {
@@ -55,17 +55,17 @@ int main(int argc, char* argv[]) {
    /* Get number of threads and number of terms from command line */
    Get_args(argc, argv);
 
-   thread_handles = (pthread_t*) malloc (thread_count*sizeof(pthread_t)); 
-   
+   thread_handles = (pthread_t*) malloc (thread_count*sizeof(pthread_t));
+
    GET_TIME(start);
    sum = 0.0;
    flag = 0;
-   for (thread = 0; thread < thread_count; thread++)  
+   for (thread = 0; thread < thread_count; thread++)
       pthread_create(&thread_handles[thread], NULL,
-          Thread_sum, (void*)thread);  
+          Thread_sum, (void*)thread);
 
-   for (thread = 0; thread < thread_count; thread++) 
-      pthread_join(thread_handles[thread], NULL); 
+   for (thread = 0; thread < thread_count; thread++)
+      pthread_join(thread_handles[thread], NULL);
    GET_TIME(finish);
    elapsed = finish - start;
 
@@ -80,20 +80,20 @@ int main(int argc, char* argv[]) {
    elapsed = finish - start;
    printf("   Single-threaded estimate of pi = %.15f\n", sum);
    printf("   Elapsed time = %e seconds\n", elapsed);
-   printf("   Math library estimate of pi    = %.15f\n", 
+   printf("   Math library estimate of pi    = %.15f\n",
        4.0*atan(1.0));
-   
+
    free(thread_handles);
    return 0;
 }  /* main */
 
 /*------------------------------------------------------------------
  * Function:       Thread_sum
- * Purpose:        Add in the terms computed by the thread running this 
+ * Purpose:        Add in the terms computed by the thread running this
  * In arg:         rank
  * Ret val:        ignored
  * Globals in:     n, thread_count
- * Global in/out:  sum 
+ * Global in/out:  sum
  */
 void* Thread_sum(void* rank) {
    long my_rank = (long) rank;
@@ -110,7 +110,7 @@ void* Thread_sum(void* rank) {
 
    for (i = my_first_i; i < my_last_i; i++, factor = -factor) {
       while (flag != my_rank);
-      sum += factor/(2*i+1);  
+      sum += factor/(2*i+1);
       flag = (flag+1) % thread_count;
    }
 
@@ -142,11 +142,11 @@ double Serial_pi(long long n) {
  * Globals out: thread_count, n
  */
 void Get_args(int argc, char* argv[]) {
-   if (argc != 3) Usage(argv[0]);
-   thread_count = strtol(argv[1], NULL, 10);  
-   if (thread_count <= 0 || thread_count > MAX_THREADS) Usage(argv[0]);
+   if (argc != 3) como_usar(argv[0]);
+   thread_count = strtol(argv[1], NULL, 10);
+   if (thread_count <= 0 || thread_count > MAX_THREADS) como_usar(argv[0]);
    n = strtoll(argv[2], NULL, 10);
-   if (n <= 0) Usage(argv[0]);
+   if (n <= 0) como_usar(argv[0]);
 }  /* Get_args */
 
 /*------------------------------------------------------------------
@@ -154,7 +154,7 @@ void Get_args(int argc, char* argv[]) {
  * Purpose:   Print a message explaining how to run the program
  * In arg:    prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage: %s <number of threads> <n>\n", prog_name);
    fprintf(stderr, "   n is the number of terms and should be >= 1\n");
    fprintf(stderr, "   n should be evenly divisible by the number of threads\n");

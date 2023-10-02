@@ -16,7 +16,7 @@
  * 2.  This version forks and joins thread_count threads in each
  *     iteration
  * 3.  Uses the OpenMP library function omp_get_wtime for timing.
- *     This function returns the number of seconds since some time 
+ *     This function returns the number of seconds since some time
  *     in the past.
  *
  * IPP:  Section 5.6.2 (pp. 234 and ff.)
@@ -33,7 +33,7 @@ const int RMAX = 10000000;
 
 int thread_count;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p);
 void Generate_list(int a[], int n);
 void Print_list(int a[], int n, char* title);
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 #  ifdef DEBUG
    Print_list(a, n, "After sort");
 #  endif
-   
+
    printf("Elapsed time = %e seconds\n", finish - start);
 
    free(a);
@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
  * Function:  Usage
  * Purpose:   Summary of how to run program
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage:   %s <thread count> <n> <g|i>\n", prog_name);
    fprintf(stderr, "   n:   number of elements in list\n");
    fprintf(stderr, "  'g':  generate list using a random number generator\n");
@@ -93,7 +93,7 @@ void Usage(char* prog_name) {
  */
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
    if (argc != 4 ) {
-      Usage(argv[0]);
+      como_usar(argv[0]);
       exit(0);
    }
    thread_count = strtol(argv[1], NULL, 10);
@@ -101,7 +101,7 @@ void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
    *g_i_p = argv[3][0];
 
    if (*n_p <= 0 || (*g_i_p != 'g' && *g_i_p != 'i') ) {
-      Usage(argv[0]);
+      como_usar(argv[0]);
       exit(0);
    }
 }  /* Get_args */

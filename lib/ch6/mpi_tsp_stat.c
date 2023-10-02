@@ -1,14 +1,14 @@
 /* File:     mpi_tsp_static.c
  *
- * Purpose:  Use iterative depth-first search and MPI to solve an 
- *           instance of the travelling salesman problem.  This version 
+ * Purpose:  Use iterative depth-first search and MPI to solve an
+ *           instance of the travelling salesman problem.  This version
  *           partitions the search tree using breadth-first search.
  *           Then each process searches its assigned subtree.  There
  *           is no reassignment of tree nodes.  This version also attempts
  *           to reuse deallocated tours.  The best tour structure
  *           is broadcast using a loop of MPI_Bsends.
  *
- * Compile:  mpicc -g -Wall -o mpi_tsp_stat mpi_tsp_stat.c 
+ * Compile:  mpicc -g -Wall -o mpi_tsp_stat mpi_tsp_stat.c
  * Usage:    mpiexec -n <proc count> mpi_tsp_stat <matrix_file>
  *
  * Input:    From a user-specified file, the number of cities
@@ -104,7 +104,7 @@ int best_costs_bcast = 0;
 int best_costs_received = 0;
 #endif
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Read_digraph(FILE* digraph_file);
 void Print_digraph(void);
 void Check_for_error(int local_ok, char message[], MPI_Comm  comm);
@@ -119,7 +119,7 @@ void Set_init_tours(int init_tour_count, int counts[], int displacements[],
 void Build_initial_queue(int** queue_list_p, int queue_size,
       int *init_tour_count_p);
 void Print_tour(tour_t tour, char* title);
-int  Best_tour(tour_t tour); 
+int  Best_tour(tour_t tour);
 void Update_best_tour(tour_t tour);
 void Copy_tour(tour_t tour1, tour_t tour2);
 void Add_city(tour_t tour, city_t);
@@ -136,7 +136,7 @@ void Cleanup_msg_queue(void);
 
 my_stack_t Init_stack(void);
 void Push(my_stack_t stack, tour_t tour);  // Push pointer
-void Push_copy(my_stack_t stack, tour_t tour, my_stack_t avail); 
+void Push_copy(my_stack_t stack, tour_t tour, my_stack_t avail);
 tour_t Pop(my_stack_t stack);
 int  Empty_stack(my_stack_t stack);
 void Free_stack(my_stack_t stack);
@@ -178,7 +178,7 @@ int main(int argc, char* argv[]) {
    if (my_rank == 0) fclose(digraph_file);
 #  ifdef DEBUG
    if (my_rank == 0) Print_digraph();
-#  endif   
+#  endif
 
    loc_best_tour = Alloc_tour(NULL);
    Init_tour(loc_best_tour, INFINITY);
@@ -193,7 +193,7 @@ int main(int argc, char* argv[]) {
    MPI_Type_commit(&tour_arr_mpi_t);
 
    MPI_Pack_size(1, MPI_INT, comm, &one_msg_sz);
-   mpi_buffer = 
+   mpi_buffer =
       malloc(100*comm_sz*(one_msg_sz + MPI_BSEND_OVERHEAD)*sizeof(char));
    MPI_Buffer_attach(mpi_buffer,
          100*comm_sz*(one_msg_sz + MPI_BSEND_OVERHEAD));
@@ -204,7 +204,7 @@ int main(int argc, char* argv[]) {
    Cleanup_msg_queue();
    MPI_Barrier(comm);
    MPI_Buffer_detach(&ret_buf, &one_msg_sz);
-   
+
    if (my_rank == 0) {
       Print_tour(loc_best_tour, "Best tour");
       printf("Cost = %d\n", loc_best_tour->cost);
@@ -227,11 +227,11 @@ int main(int argc, char* argv[]) {
 /*------------------------------------------------------------------
  * Function:  Init_tour
  * Purpose:   Initialize the data members of allocated tour
- * In args:   
+ * In args:
  *    cost:   initial cost of tour
  * Global in:
  *    n:      number of cities in TSP
- * Out arg:   
+ * Out arg:
  *    tour
  * Local function
  */
@@ -309,7 +309,7 @@ void Print_digraph(void) {
 /*------------------------------------------------------------------
  * Function:    Par_tree_search
  * Purpose:     Use multiple threads to search a tree
- * In arg:     
+ * In arg:
  *    rank:     thread rank
  * Globals in:
  *    n:        total number of cities in the problem
@@ -340,7 +340,7 @@ void Par_tree_search(void) {
             Update_best_tour(curr_tour);
          }
       } else {
-         for (nbr = n-1; nbr >= 1; nbr--) 
+         for (nbr = n-1; nbr >= 1; nbr--)
             if (Feasible(curr_tour, nbr)) {
                Add_city(curr_tour, nbr);
                Push_copy(stack, curr_tour, avail);
@@ -391,15 +391,15 @@ void Get_global_best_tour(void) {
       loc_best_tour->count = n+1;
    } else if (my_rank == global_data.rank) {
       MPI_Send(loc_best_tour->cities, n+1, MPI_INT, 0, 0, comm);
-   } 
+   }
 }  /* Get_global_best_tour */
 
 /*------------------------------------------------------------------
  * Function:  Partition_tree
  * Purpose:   Assign each thread its initial collection of subtrees
- * In arg:    
+ * In arg:
  *    my_rank
- * Out args:   
+ * Out args:
  *    stack:  stack will store each thread's initial tours
  *
  */
@@ -420,16 +420,16 @@ void Partition_tree(my_stack_t stack) {
    }
    Check_for_error(local_ok, "Too many processes", comm);
 
-   if (my_rank == 0) 
+   if (my_rank == 0)
       Build_initial_queue(&queue_list, queue_size, &init_tour_count);
    MPI_Bcast(&init_tour_count, 1, MPI_INT, 0, comm);
 
-   Set_init_tours(init_tour_count, counts, displacements, 
+   Set_init_tours(init_tour_count, counts, displacements,
          &my_count, &tour_list);
 
    MPI_Scatterv(queue_list, counts, displacements, tour_arr_mpi_t,
          tour_list, my_count, tour_arr_mpi_t, 0, comm);
-   
+
    Build_init_stack(stack, tour_list, my_count);
 
 #  ifdef DEBUG
@@ -515,7 +515,7 @@ void Set_init_tours(int init_tour_count, int counts[], int displacements[],
 
    quotient = init_tour_count/comm_sz;
    remainder = init_tour_count % comm_sz;
-   for (i = 0; i < remainder; i++) 
+   for (i = 0; i < remainder; i++)
       counts[i] = quotient+1;
    for (i = remainder; i  < comm_sz; i++)
       counts[i] = quotient;
@@ -539,7 +539,7 @@ void Set_init_tours(int init_tour_count, int counts[], int displacements[],
  *
  * Note:  Only called by one process/thread
  */
-void Build_initial_queue(city_t** queue_list_p, int queue_size, 
+void Build_initial_queue(city_t** queue_list_p, int queue_size,
       int* init_tour_count_p) {
    my_queue_t queue;
    int curr_sz = 0, i;
@@ -570,7 +570,7 @@ void Build_initial_queue(city_t** queue_list_p, int queue_size,
       Free_tour(tour, NULL);
    }  /* while */
 
-   *init_tour_count_p = curr_sz; 
+   *init_tour_count_p = curr_sz;
 
 #  ifdef DEBUG
    Print_queue(queue, 0, "Initial queue");
@@ -579,7 +579,7 @@ void Build_initial_queue(city_t** queue_list_p, int queue_size,
    /* Copy the city lists from queue into queue_list */
    queue_list = malloc((*init_tour_count_p)*(n+1)*sizeof(int));
    for (i = 0; i < *init_tour_count_p; i++)
-      memcpy(queue_list + i*(n+1), Queue_elt(queue,i)->cities, 
+      memcpy(queue_list + i*(n+1), Queue_elt(queue,i)->cities,
             (n+1)*sizeof(int));
    *queue_list_p = queue_list;
    Free_queue(queue);
@@ -587,7 +587,7 @@ void Build_initial_queue(city_t** queue_list_p, int queue_size,
 
 /*------------------------------------------------------------------
  * Function:    Best_tour
- * Purpose:     Determine whether addition of the hometown to the 
+ * Purpose:     Determine whether addition of the hometown to the
  *              n-city input tour will lead to a best tour.
  * In arg:
  *    tour:     tour visiting all n cities
@@ -623,7 +623,7 @@ void Look_for_best_tours(void) {
    MPI_Status status;
 
    while(!done) {
-      MPI_Iprobe(MPI_ANY_SOURCE, TOUR_TAG, comm, &msg_avail, 
+      MPI_Iprobe(MPI_ANY_SOURCE, TOUR_TAG, comm, &msg_avail,
             &status);
       if (msg_avail) {
          MPI_Recv(&tour_cost, 1, MPI_INT, status.MPI_SOURCE, TOUR_TAG,
@@ -651,7 +651,7 @@ void Look_for_best_tours(void) {
  * Global out:
  *    loc_best_tour:  the current best tour on this process
  *    best_tour_cost
- * Note: 
+ * Note:
  * 1. The input tour hasn't had the home_town added as the last
  *    city before the call to Update_loc_best_tour.  So we call
  *    Add_city(loc_best_tour, hometown) before returning.
@@ -737,7 +737,7 @@ void Add_city(tour_t tour, city_t new_city) {
 void Remove_last_city(tour_t tour) {
    city_t old_last_city = Last_city(tour);
    city_t new_last_city;
-   
+
    tour->cities[tour->count-1] = NO_CITY;
    (tour->count)--;
    new_last_city = Last_city(tour);
@@ -761,7 +761,7 @@ void Remove_last_city(tour_t tour) {
 int Feasible(tour_t tour, city_t city) {
    city_t last_city = Last_city(tour);
 
-   if (!Visited(tour, city) && 
+   if (!Visited(tour, city) &&
         Tour_cost(tour) + Cost(last_city,city) < best_tour_cost)
       return TRUE;
    else
@@ -790,8 +790,8 @@ int Visited(tour_t tour, city_t city) {
  * Function:  Print_tour
  * Purpose:   Print a tour
  * In args:   All
- * Notes:      
- * 1.  Copying the tour to a string makes it less likely that the 
+ * Notes:
+ * 1.  Copying the tour to a string makes it less likely that the
  *     output will be broken up by another process/thread
  * 2.  Passing a negative value for my_rank will cause the rank
  *     to be omitted from the output
@@ -835,7 +835,7 @@ tour_t Alloc_tour(my_stack_t avail) {
  * Purpose:   Free a tour
  * In/out arg:
  *    avail
- * Out arg:   
+ * Out arg:
  *    tour
  */
 void Free_tour(tour_t tour, my_stack_t avail) {
@@ -893,7 +893,7 @@ void Push(my_stack_t stack, tour_t tour) {
  * Function:    Push_copy
  * Purpose:     Push a copy of tour onto the top of the stack
  * In arg:      tour
- * In/out arg:  
+ * In/out arg:
  *    stack
  *    avail
  * Error:       If the stack is full, print an error and exit
@@ -1001,7 +1001,7 @@ my_queue_t Init_queue(int size) {
 
 /*------------------------------------------------------------------
  * Function:   Dequeue
- * Purpose:    Remove the tour at the head of the queue and return 
+ * Purpose:    Remove the tour at the head of the queue and return
  *             it
  * In/out arg: queue
  * Ret val:    tour at head of queue
@@ -1037,7 +1037,7 @@ void Enqueue(my_queue_t queue, tour_t tour) {
    Copy_tour(tour, tmp);
 // printf("Enqueuing %p\n", tmp);
    queue->list[queue->tail] = tmp;
-   queue->tail = (queue->tail + 1) % queue->list_alloc; 
+   queue->tail = (queue->tail + 1) % queue->list_alloc;
    if (queue->tail == queue->head)
       queue->full = TRUE;
 
@@ -1064,7 +1064,7 @@ int Empty_queue(my_queue_t queue) {
  */
 void Free_queue(my_queue_t queue) {
 // int i;
-// 
+//
 // for (i = queue->head; i != queue->tail; i = (i+1) % queue->list_alloc) {
 //    free(queue->list[i]->cities);
 //    free(queue->list[i]);
@@ -1094,7 +1094,7 @@ void Print_queue(my_queue_t queue, char title[]) {
 
 /*------------------------------------------------------------------
  * Function:    Get_upper_bd_queue_sz
- * Purpose:     Determine the number of tours needed so that 
+ * Purpose:     Determine the number of tours needed so that
  *              each thread/process gets at least one and a level
  *              of the tree is fully expanded.  Used as upper
  *              bound when building initial queue and used as
@@ -1153,7 +1153,7 @@ void Cleanup_msg_queue(void) {
    MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &msg_recd, &status);
    while (msg_recd) {
       /* Just receive the message . . . */
-      MPI_Recv(work_buf, 100000, MPI_BYTE, status.MPI_SOURCE, 
+      MPI_Recv(work_buf, 100000, MPI_BYTE, status.MPI_SOURCE,
             status.MPI_TAG, comm, MPI_STATUS_IGNORE);
       if (status.MPI_TAG == TOUR_TAG)
          counts[1]++;
@@ -1161,7 +1161,7 @@ void Cleanup_msg_queue(void) {
          counts[0]++;
       MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &msg_recd, &status);
    }
-   sprintf(string1, "Messages not received:  unknown = %d, tour = %d", 
+   sprintf(string1, "Messages not received:  unknown = %d, tour = %d",
          counts[0], counts[1]);
 // printf("Proc %d > %s\n", my_rank, string1);
 }  /* Cleanup_msg_queue */
@@ -1172,8 +1172,8 @@ void Cleanup_msg_queue(void) {
  *            if there has been an error.
  */
 void Check_for_error(
-      int       local_ok   /* in */, 
-      char      message[]  /* in */, 
+      int       local_ok   /* in */,
+      char      message[]  /* in */,
       MPI_Comm  comm       /* in */) {
    int ok;
 

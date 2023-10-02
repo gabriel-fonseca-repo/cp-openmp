@@ -19,7 +19,7 @@
 /* Keys in the random list in the range 0 <= key < RMAX */
 const int RMAX = 100;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p);
 void Generate_list(int a[], int n);
 void Print_list(int a[], int n, char* title);
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
    Odd_even_sort(a, n);
 
    Print_list(a, n, "After sort");
-   
+
    free(a);
    return 0;
 }  /* main */
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
  * Function:  Usage
  * Purpose:   Summary of how to run program
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage:   %s <n> <g|i>\n", prog_name);
    fprintf(stderr, "   n:   number of elements in list\n");
    fprintf(stderr, "  'g':  generate list using a random number generator\n");
@@ -70,14 +70,14 @@ void Usage(char* prog_name) {
  */
 void Get_args(int argc, char* argv[], int* n_p, char* g_i_p) {
    if (argc != 3 ) {
-      Usage(argv[0]);
+      como_usar(argv[0]);
       exit(0);
    }
    *n_p = atoi(argv[1]);
    *g_i_p = argv[2][0];
 
    if (*n_p <= 0 || (*g_i_p != 'g' && *g_i_p != 'i') ) {
-      Usage(argv[0]);
+      como_usar(argv[0]);
       exit(0);
    }
 }  /* Get_args */
@@ -135,13 +135,13 @@ void Read_list(int a[], int n) {
  * In/out args:  a
  */
 void Odd_even_sort(
-      int  a[]  /* in/out */, 
+      int  a[]  /* in/out */,
       int  n    /* in     */) {
    int phase, i, temp;
 
-   for (phase = 0; phase < n; phase++) 
+   for (phase = 0; phase < n; phase++)
       if (phase % 2 == 0) { /* Even phase */
-         for (i = 1; i < n; i += 2) 
+         for (i = 1; i < n; i += 2)
             if (a[i-1] > a[i]) {
                temp = a[i];
                a[i] = a[i-1];

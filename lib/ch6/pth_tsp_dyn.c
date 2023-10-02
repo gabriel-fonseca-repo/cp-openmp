@@ -1,7 +1,7 @@
 /* File:     pth_tsp_dyn.c
  *
- * Purpose:  Use iterative depth-first search and pthreads to solve an 
- *           instance of the travelling salesman problem.  This version 
+ * Purpose:  Use iterative depth-first search and pthreads to solve an
+ *           instance of the travelling salesman problem.  This version
  *           partitions the search tree using breadth-first search.
  *           Then each thread searches its assigned subtree.  When
  *           a thread runs out of work, it goes into a condition
@@ -115,7 +115,7 @@ term_t term;
 /* Statistics */
 int stack_splits = 0;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void Read_digraph(FILE* digraph_file);
 void Print_digraph(void);
 
@@ -125,7 +125,7 @@ void Set_init_tours(long my_rank, int* my_first_tour_p,
       int* my_last_tour_p);
 void Build_initial_queue(void);
 void Print_tour(long my_rank, tour_t tour, char* title);
-int  Best_tour(tour_t tour); 
+int  Best_tour(tour_t tour);
 void Update_best_tour(tour_t tour);
 void Copy_tour(tour_t tour1, tour_t tour2);
 void Add_city(tour_t tour, city_t);
@@ -143,7 +143,7 @@ my_stack_t Split_stack(my_stack_t stack, long my_rank);
 
 my_stack_t Init_stack(void);
 void Push(my_stack_t stack, tour_t tour);  // Push pointer
-void Push_copy(my_stack_t stack, tour_t tour, my_stack_t avail); 
+void Push_copy(my_stack_t stack, tour_t tour, my_stack_t avail);
 tour_t Pop(my_stack_t stack);
 int  Empty_stack(my_stack_t stack);
 void Free_stack(my_stack_t stack);
@@ -171,27 +171,27 @@ int main(int argc, char* argv[]) {
    long thread;
    pthread_t* thread_handles;
 
-   if (argc != 4) Usage(argv[0]);
+   if (argc != 4) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
    if (thread_count <= 0) {
       fprintf(stderr, "Thread count must be positive\n");
-      Usage(argv[0]);
+      como_usar(argv[0]);
    }
    digraph_file = fopen(argv[2], "r");
    if (digraph_file == NULL) {
       fprintf(stderr, "Can't open %s\n", argv[2]);
-      Usage(argv[0]);
+      como_usar(argv[0]);
    }
    min_split_sz = strtol(argv[3], NULL, 10);
    if (min_split_sz <= 0) {
       fprintf(stderr, "Min split size should be positive\n");
-      Usage(argv[0]);
+      como_usar(argv[0]);
    }
    Read_digraph(digraph_file);
    fclose(digraph_file);
 #  ifdef DEBUG
    Print_digraph();
-#  endif   
+#  endif
 
    thread_handles = malloc(thread_count*sizeof(pthread_t));
    bar_str = My_barrier_init(thread_count);
@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
    for (thread = 0; thread < thread_count; thread++)
       pthread_join(thread_handles[thread], NULL);
    GET_TIME(finish);
-   
+
    Print_tour(-1, best_tour, "Best tour");
    printf("Cost = %d\n", best_tour->cost);
    printf("Elapsed time = %e seconds\n", finish-start);
@@ -236,11 +236,11 @@ int main(int argc, char* argv[]) {
 /*------------------------------------------------------------------
  * Function:  Init_tour
  * Purpose:   Initialize the data members of allocated tour
- * In args:   
+ * In args:
  *    cost:   initial cost of tour
  * Global in:
  *    n:      number of cities in TSP
- * Out arg:   
+ * Out arg:
  *    tour
  */
 void Init_tour(tour_t tour, cost_t cost) {
@@ -260,7 +260,7 @@ void Init_tour(tour_t tour, cost_t cost) {
  * Purpose:   Inform user how to start program and exit
  * In arg:    prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
    fprintf(stderr, "usage: %s <thread_count> <digraph file> <min split size>\n",
          prog_name);
    exit(0);
@@ -323,7 +323,7 @@ void Print_digraph(void) {
 /*------------------------------------------------------------------
  * Function:    Par_tree_search
  * Purpose:     Use multiple threads to search a tree
- * In arg:     
+ * In arg:
  *    rank:     thread rank
  * Globals in:
  *    n:        total number of cities in the problem
@@ -355,7 +355,7 @@ void* Par_tree_search(void* rank) {
             Update_best_tour(curr_tour);
          }
       } else {
-         for (nbr = n-1; nbr >= 1; nbr--) 
+         for (nbr = n-1; nbr >= 1; nbr--)
             if (Feasible(curr_tour, nbr)) {
                Add_city(curr_tour, nbr);
                Push_copy(stack, curr_tour, avail);
@@ -374,12 +374,12 @@ void* Par_tree_search(void* rank) {
 /*------------------------------------------------------------------
  * Function:  Partition_tree
  * Purpose:   Assign each thread its initial collection of subtrees
- * In arg:    
+ * In arg:
  *    my_rank
- * Out args:   
+ * Out args:
  *    stack:  stack will store each thread's initial tours
  *
- * Global scratch:  
+ * Global scratch:
  *    queue_size
  *    queue
  *
@@ -398,7 +398,7 @@ void Partition_tree(long my_rank, my_stack_t stack) {
    My_barrier(bar_str);
    Set_init_tours(my_rank, &my_first_tour, &my_last_tour);
 #  ifdef DEBUG
-   printf("Th %ld > init_tour_count = %d, first = %d, last = %d\n", 
+   printf("Th %ld > init_tour_count = %d, first = %d, last = %d\n",
          my_rank, init_tour_count, my_first_tour, my_last_tour);
 #  endif
    for (i = my_last_tour; i >= my_first_tour; i--) {
@@ -482,7 +482,7 @@ void Build_initial_queue(void) {
 //    printf("Freeing %p\n", tour);
       Free_tour(tour, NULL);
    }  /* while */
-   init_tour_count = curr_sz; 
+   init_tour_count = curr_sz;
 
 #  ifdef DEBUG
    Print_queue(queue, 0, "Initial queue");
@@ -491,7 +491,7 @@ void Build_initial_queue(void) {
 
 /*------------------------------------------------------------------
  * Function:    Best_tour
- * Purpose:     Determine whether addition of the hometown to the 
+ * Purpose:     Determine whether addition of the hometown to the
  *              n-city input tour will lead to a best tour.
  * In arg:
  *    tour:     tour visiting all n cities
@@ -517,7 +517,7 @@ int Best_tour(tour_t tour) {
  *    tour:     tour that's visited all n-cities
  * Global out:
  *    best_tour:  the current best tour
- * Note: 
+ * Note:
  * 1. The input tour hasn't had the home_town added as the last
  *    city before the call to Update_best_tour.  So we call
  *    Add_city(best_tour, hometown) before returning.
@@ -527,7 +527,7 @@ int Best_tour(tour_t tour) {
  *       best_tour_cost = 1000
  *       Time       Th 0                 Th 1
  *       ----       ----                 ----
- *        0         tour->cost = 10     
+ *        0         tour->cost = 10
  *        1         Best_tour ret true   tour->cost = 20
  *        2                              Best_tour ret true
  *        3         Lock mutex
@@ -543,7 +543,7 @@ void Update_best_tour(tour_t tour) {
    if (Best_tour(tour)) {
       Copy_tour(tour, best_tour);
       Add_city(best_tour, home_town);
-   } 
+   }
    pthread_mutex_unlock(&best_tour_mutex);
 }  /* Update_best_tour */
 
@@ -594,7 +594,7 @@ void Add_city(tour_t tour, city_t new_city) {
 void Remove_last_city(tour_t tour) {
    city_t old_last_city = Last_city(tour);
    city_t new_last_city;
-   
+
    tour->cities[tour->count-1] = NO_CITY;
    (tour->count)--;
    new_last_city = Last_city(tour);
@@ -618,7 +618,7 @@ void Remove_last_city(tour_t tour) {
 int Feasible(tour_t tour, city_t city) {
    city_t last_city = Last_city(tour);
 
-   if (!Visited(tour, city) && 
+   if (!Visited(tour, city) &&
         Tour_cost(tour) + Cost(last_city,city) < Tour_cost(best_tour))
       return TRUE;
    else
@@ -647,8 +647,8 @@ int Visited(tour_t tour, city_t city) {
  * Function:  Print_tour
  * Purpose:   Print a tour
  * In args:   All
- * Notes:      
- * 1.  Copying the tour to a string makes it less likely that the 
+ * Notes:
+ * 1.  Copying the tour to a string makes it less likely that the
  *     output will be broken up by another process/thread
  * 2.  Passing a negative value for my_rank will cause the rank
  *     to be omitted from the output
@@ -692,7 +692,7 @@ tour_t Alloc_tour(my_stack_t avail) {
  * Purpose:   Free a tour
  * In/out arg:
  *    avail
- * Out arg:   
+ * Out arg:
  *    tour
  */
 void Free_tour(tour_t tour, my_stack_t avail) {
@@ -750,7 +750,7 @@ void Push(my_stack_t stack, tour_t tour) {
  * Function:    Push_copy
  * Purpose:     Push a copy of tour onto the top of the stack
  * In arg:      tour
- * In/out arg:  
+ * In/out arg:
  *    stack
  *    avail
  * Error:       If the stack is full, print an error and exit
@@ -823,7 +823,7 @@ void Free_stack(my_stack_t stack) {
    }
    free(stack->list);
    free(stack);
-   
+
 }  /* Free_stack */
 
 /*------------------------------------------------------------------
@@ -864,7 +864,7 @@ my_queue_t Init_queue(int size) {
 
 /*------------------------------------------------------------------
  * Function:   Dequeue
- * Purpose:    Remove the tour at the head of the queue and return 
+ * Purpose:    Remove the tour at the head of the queue and return
  *             it
  * In/out arg: queue
  * Ret val:    tour at head of queue
@@ -900,7 +900,7 @@ void Enqueue(my_queue_t queue, tour_t tour) {
    Copy_tour(tour, tmp);
 // printf("Enqueuing %p\n", tmp);
    queue->list[queue->tail] = tmp;
-   queue->tail = (queue->tail + 1) % queue->list_alloc; 
+   queue->tail = (queue->tail + 1) % queue->list_alloc;
    if (queue->tail == queue->head)
       queue->full = TRUE;
 
@@ -927,7 +927,7 @@ int Empty_queue(my_queue_t queue) {
  */
 void Free_queue(my_queue_t queue) {
 // int i;
-// 
+//
 // for (i = queue->head; i != queue->tail; i = (i+1) % queue->list_alloc) {
 //    free(queue->list[i]->cities);
 //    free(queue->list[i]);
@@ -957,7 +957,7 @@ void Print_queue(my_queue_t queue, long my_rank, char title[]) {
 
 /*------------------------------------------------------------------
  * Function:    Get_upper_bd_queue_sz
- * Purpose:     Determine the number of tours needed so that 
+ * Purpose:     Determine the number of tours needed so that
  *              each thread/process gets at least one and a level
  *              of the tree is fully expanded.  Used as upper
  *              bound when building initial queue and used as
@@ -1004,7 +1004,7 @@ long long Fact(int k) {
 /*------------------------------------------------------------------
  * Function:  My_barrier_init
  * Purpose:   Initialize data members of barrier struct
- * In arg:    
+ * In arg:
  *    thr_count:  number of threads that will use this barrier
  * Ret val:
  *    Pointer to initialized barrier struct
@@ -1073,7 +1073,7 @@ int  Terminated(my_stack_t* stack_p, long my_rank) {
 #  endif
 
    if (stack->list_sz >= min_split_sz && term->count > 0 &&
-         term->stack == NULL) {  
+         term->stack == NULL) {
              /* Lots of tours in stack */
       got_lock = pthread_mutex_trylock(&term->mutex);
       if (got_lock == 0) {
@@ -1098,7 +1098,7 @@ int  Terminated(my_stack_t* stack_p, long my_rank) {
 #     endif
       pthread_mutex_lock(&term->mutex);
 #     ifdef TERM_DEBUG
-      printf("Th %ld > Got mutex, term->count = %d\n", 
+      printf("Th %ld > Got mutex, term->count = %d\n",
             my_rank, term->count);
 #     endif
       if (term->count == thread_count-1) { /* Last thread running */
@@ -1141,7 +1141,7 @@ int  Terminated(my_stack_t* stack_p, long my_rank) {
          }
       } /* else wait for work */
    }  /* else my stack is empty */
-}  /* Terminated */   
+}  /* Terminated */
 
 
 /*------------------------------------------------------------------
@@ -1189,7 +1189,7 @@ my_stack_t Split_stack(my_stack_t stack, long my_rank) {
    for (new_src = 1; new_src < stack->list_sz; new_src += 2) {
       old_src = new_src+1;
       new_stack->list[new_dest++] = stack->list[new_src];
-      if (old_src < stack->list_sz) 
+      if (old_src < stack->list_sz)
          stack->list[old_dest++] = stack->list[old_src];
    }
 

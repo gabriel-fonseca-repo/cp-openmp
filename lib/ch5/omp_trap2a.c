@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 double f(double x); /* Function we're integrating */
 double Local_trap(double a, double b, int n);
 
@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
     a = strtol(argv[2], NULL, 10);
     b = strtol(argv[3], NULL, 10);
     n = strtol(argv[4], NULL, 10);
-    if (n % thread_count != 0) Usage(argv[0]);
+    if (n % thread_count != 0) como_usar(argv[0]);
 
     start_time = omp_get_wtime();
     global_result = 0.0;
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
     fprintf(stderr, "usage: %s <number of threads>\n", prog_name);
     fprintf(stderr, "   number of trapezoids must be evenly divisible by\n");
     fprintf(stderr, "   number of threads\n");

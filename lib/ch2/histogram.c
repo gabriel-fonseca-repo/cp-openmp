@@ -1,6 +1,6 @@
 /* File:      histogram.c
  * Purpose:   Build a histogram from some random data
- * 
+ *
  * Compile:   gcc -g -Wall -o histogram histogram.c
  * Run:       ./histogram <bin_count> <min_meas> <max_meas> <data_count>
  *
@@ -14,7 +14,7 @@
  * 3.  bin_maxes[i-1] <= x < bin_maxes[i] (bin_maxes[-1] = min_meas)
  * 4.  DEBUG compile flag gives verbose output
  * 5.  The program will terminate if either the number of command line
- *     arguments is incorrect or if the search for a bin for a 
+ *     arguments is incorrect or if the search for a bin for a
  *     measurement fails.
  *
  * IPP:  Section 2.7.1 (pp. 66 and ff.)
@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void Usage(char prog_name[]);
+void como_usar(char prog_name[]);
 
 void Get_args(
       char*    argv[]        /* in  */,
@@ -31,29 +31,29 @@ void Get_args(
       float*   max_meas_p    /* out */,
       int*     data_count_p  /* out */);
 
-void Gen_data(
-      float   min_meas    /* in  */, 
-      float   max_meas    /* in  */, 
+void gerar_dados(
+      float   min_meas    /* in  */,
+      float   max_meas    /* in  */,
       float   data[]      /* out */,
       int     data_count  /* in  */);
 
 void Gen_bins(
-      float min_meas      /* in  */, 
-      float max_meas      /* in  */, 
-      float bin_maxes[]   /* out */, 
-      int   bin_counts[]  /* out */, 
+      float min_meas      /* in  */,
+      float max_meas      /* in  */,
+      float bin_maxes[]   /* out */,
+      int   bin_counts[]  /* out */,
       int   bin_count     /* in  */);
 
-int Which_bin(
-      float    data         /* in */, 
-      float    bin_maxes[]  /* in */, 
-      int      bin_count    /* in */, 
+int qual_bin(
+      float    data         /* in */,
+      float    bin_maxes[]  /* in */,
+      int      bin_count    /* in */,
       float    min_meas     /* in */);
 
-void Print_histo(
-      float    bin_maxes[]   /* in */, 
-      int      bin_counts[]  /* in */, 
-      int      bin_count     /* in */, 
+void printar_histograma(
+      float    bin_maxes[]   /* in */,
+      int      bin_counts[]  /* in */,
+      int      bin_count     /* in */,
       float    min_meas      /* in */);
 
 int main(int argc, char* argv[]) {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
    float* data;
 
    /* Check and get command line args */
-   if (argc != 5) Usage(argv[0]); 
+   if (argc != 5) como_usar(argv[0]);
    Get_args(argv, &bin_count, &min_meas, &max_meas, &data_count);
 
    /* Allocate arrays needed */
@@ -74,14 +74,14 @@ int main(int argc, char* argv[]) {
    data = malloc(data_count*sizeof(float));
 
    /* Generate the data */
-   Gen_data(min_meas, max_meas, data, data_count);
+   gerar_dados(min_meas, max_meas, data, data_count);
 
    /* Create bins for storing counts */
    Gen_bins(min_meas, max_meas, bin_maxes, bin_counts, bin_count);
 
    /* Count number of values in each bin */
    for (i = 0; i < data_count; i++) {
-      bin = Which_bin(data[i], bin_maxes, bin_count, min_meas);
+      bin = qual_bin(data[i], bin_maxes, bin_count, min_meas);
       bin_counts[bin]++;
    }
 
@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
 #  endif
 
    /* Print the histogram */
-   Print_histo(bin_maxes, bin_counts, bin_count, min_meas);
+   printar_histograma(bin_maxes, bin_counts, bin_count, min_meas);
 
    free(data);
    free(bin_maxes);
@@ -104,12 +104,12 @@ int main(int argc, char* argv[]) {
 
 
 /*---------------------------------------------------------------------
- * Function:  Usage 
+ * Function:  Usage
  * Purpose:   Print a message showing how to run program and quit
  * In arg:    prog_name:  the name of the program from the command line
  */
-void Usage(char prog_name[] /* in */) {
-   fprintf(stderr, "usage: %s ", prog_name); 
+void como_usar(char prog_name[] /* in */) {
+   fprintf(stderr, "usage: %s ", prog_name);
    fprintf(stderr, "<bin_count> <min_meas> <max_meas> <data_count>\n");
    exit(0);
 }  /* Usage */
@@ -152,9 +152,9 @@ void Get_args(
  *            data_count:  the number of measurements
  * Out arg:   data:        the actual measurements
  */
-void Gen_data(
-        float   min_meas    /* in  */, 
-        float   max_meas    /* in  */, 
+void gerar_dados(
+        float   min_meas    /* in  */,
+        float   max_meas    /* in  */,
         float   data[]      /* out */,
         int     data_count  /* in  */) {
    int i;
@@ -183,10 +183,10 @@ void Gen_data(
  *            bin_counts: the number of data values in each bin
  */
 void Gen_bins(
-      float min_meas      /* in  */, 
-      float max_meas      /* in  */, 
-      float bin_maxes[]   /* out */, 
-      int   bin_counts[]  /* out */, 
+      float min_meas      /* in  */,
+      float max_meas      /* in  */,
+      float bin_maxes[]   /* out */,
+      int   bin_counts[]  /* out */,
       int   bin_count     /* in  */) {
    float bin_width;
    int   i;
@@ -209,25 +209,25 @@ void Gen_bins(
 
 /*---------------------------------------------------------------------
  * Function:  Which_bin
- * Purpose:   Use binary search to determine which bin a measurement 
+ * Purpose:   Use binary search to determine which bin a measurement
  *            belongs to
  * In args:   data:       the current measurement
  *            bin_maxes:  list of max bin values
  *            bin_count:  number of bins
  *            min_meas:   the minimum possible measurement
  * Return:    the number of the bin to which data belongs
- * Notes:      
+ * Notes:
  * 1.  The bin to which data belongs satisfies
  *
- *            bin_maxes[i-1] <= data < bin_maxes[i] 
+ *            bin_maxes[i-1] <= data < bin_maxes[i]
  *
  *     where, bin_maxes[-1] = min_meas
  * 2.  If the search fails, the function prints a message and exits
  */
-int Which_bin(
-      float   data          /* in */, 
-      float   bin_maxes[]   /* in */, 
-      int     bin_count     /* in */, 
+int qual_bin(
+      float   data          /* in */,
+      float   bin_maxes[]   /* in */,
+      int     bin_count     /* in */,
       float   min_meas      /* in */) {
    int bottom = 0, top =  bin_count-1;
    int mid;
@@ -237,7 +237,7 @@ int Which_bin(
       mid = (bottom + top)/2;
       bin_max = bin_maxes[mid];
       bin_min = (mid == 0) ? min_meas: bin_maxes[mid-1];
-      if (data >= bin_max) 
+      if (data >= bin_max)
          bottom = mid+1;
       else if (data < bin_min)
          top = mid-1;
@@ -261,10 +261,10 @@ int Which_bin(
  *            bin_count:   the number of bins
  *            min_meas:    the minimum possible measurment
  */
-void Print_histo(
-        float  bin_maxes[]   /* in */, 
-        int    bin_counts[]  /* in */, 
-        int    bin_count     /* in */, 
+void printar_histograma(
+        float  bin_maxes[]   /* in */,
+        int    bin_counts[]  /* in */,
+        int    bin_count     /* in */,
         float  min_meas      /* in */) {
    int i, j;
    float bin_max, bin_min;

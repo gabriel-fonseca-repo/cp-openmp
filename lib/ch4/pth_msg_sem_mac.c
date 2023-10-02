@@ -32,7 +32,7 @@ char** messages;
 char** snames;
 sem_t** sems;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void *Send_msg(void* rank);  /* Thread function */
 
 /*--------------------------------------------------------------------*/
@@ -40,9 +40,9 @@ int main(int argc, char* argv[]) {
    long       thread;
    pthread_t* thread_handles;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
-   if (thread_count <= 0 || thread_count > MAX_THREADS) Usage(argv[0]);
+   if (thread_count <= 0 || thread_count > MAX_THREADS) como_usar(argv[0]);
 
    thread_handles = (pthread_t*) malloc (thread_count*sizeof(pthread_t));
    messages = (char**) malloc(thread_count*sizeof(char*));
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
 
    fprintf(stderr, "usage: %s <number of threads>\n", prog_name);
    exit(0);

@@ -1,6 +1,6 @@
 /* File:     pth_msg_sem.c
  *
- * Purpose:  Illustrate a synchronization problem with pthreads:  create 
+ * Purpose:  Illustrate a synchronization problem with pthreads:  create
  *           some threads, each of which creates a message and "sends" it
  *           to another thread, by copying it into that thread's buffer.
  *           This version uses semaphores to solve the synchronization
@@ -32,17 +32,17 @@ int thread_count;
 char** messages;
 sem_t* semaphores;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void *Send_msg(void* rank);  /* Thread function */
 
 /*--------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
    long       thread;
-   pthread_t* thread_handles; 
+   pthread_t* thread_handles;
 
-   if (argc != 2) Usage(argv[0]);
+   if (argc != 2) como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
-   if (thread_count <= 0 || thread_count > MAX_THREADS) Usage(argv[0]);
+   if (thread_count <= 0 || thread_count > MAX_THREADS) como_usar(argv[0]);
 
    thread_handles = malloc (thread_count*sizeof(pthread_t));
    messages = malloc(thread_count*sizeof(char*));
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
 
    fprintf(stderr, "usage: %s <number of threads>\n", prog_name);
    exit(0);

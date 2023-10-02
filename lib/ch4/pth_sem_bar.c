@@ -1,4 +1,4 @@
-/* File:  
+/* File:
  *    pth_sem_bar.c
  *
  * Purpose:
@@ -36,17 +36,17 @@ int counter;
 sem_t barrier_sems[BARRIER_COUNT];
 sem_t count_sem;
 
-void Usage(char* prog_name);
+void como_usar(char* prog_name);
 void *Thread_work(void* rank);
 
 /*--------------------------------------------------------------------*/
 int main(int argc, char* argv[]) {
    long       thread, i;
-   pthread_t* thread_handles; 
+   pthread_t* thread_handles;
    double start, finish;
 
    if (argc != 2)
-      Usage(argv[0]);
+      como_usar(argv[0]);
    thread_count = strtol(argv[1], NULL, 10);
 
    thread_handles = malloc (thread_count*sizeof(pthread_t));
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
  * Purpose:     Print command line for function and terminate
  * In arg:      prog_name
  */
-void Usage(char* prog_name) {
+void como_usar(char* prog_name) {
 
    fprintf(stderr, "usage: %s <number of threads>\n", prog_name);
    exit(0);
